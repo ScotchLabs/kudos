@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<h1>Welcome!</h1>
+{% if current_user.is_authenticated %}
+    Hi {{ current_user.username }}!
+    <p>Do you want to <a href="{{ url_for('signout') }}">log out?</a></p>
+    <p>Do you want to <a href="{{ url_for('change_password') }}">change your password?</a></p>
+{% else %}
+    <p>Do you want to <a href="{{ url_for('signin') }}">log in?</a></p>
+    <p>Do you want to <a href="{{ url_for('signup') }}">create an account?</a></p>
+    <p>Did you <a href="{{ url_for('reset') }}">forget your password?</a></p>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,13 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "layout.html" %}
+
+{% block body %}
+This is where people <b>sign in</b>
+
+<form method="POST">
+    {{ form.csrf_token }}
+    {{ render_field(form.username) }}
+    {{ render_field(form.password) }}
+    <input type="submit" value="Sign In">
+</form>
+{% endblock %}

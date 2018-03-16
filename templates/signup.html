@@ -1,0 +1,10 @@
+{% from "_formhelpers.html" import render_field %}
+
+This is where you <b>sign up</b>
+
+<form method="POST">
+    {{ form.csrf_token }}
+    {{ render_field(form.username) }}
+    {{ render_field(form.password) }}
+    <input type="submit" value="Register">
+</form>
