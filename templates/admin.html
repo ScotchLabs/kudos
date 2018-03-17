@@ -1,0 +1,29 @@
+{% from "_formhelpers.html" import render_errors %}
+{% extends "layout.html" %}
+
+{% block body %}
+
+<form method="POST" action="/admin/ban">
+    {{ bform.csrf_token }}
+    {{ bform.username() }}
+    <input type="submit" value="Ban User">
+    {{ render_errors(bform.username) }}
+</form>
+
+<form method="POST" action="/admin/unban">
+    {{ uform.csrf_token }}
+    {{ uform.username() }}
+    <input type="submit" value="Unban User">
+    {{ render_errors(uform.username) }}
+</form>
+
+<h1>Nominations</h1>
+{% for award in awards %}
+    <h2>{{ award.name }}</h2>
+    {% for nom in award.nominations %}
+        {{ nom.name }} | {{ nom.creator.username }} | <a href="/admin/remove?nom={{ nom.id }}">Remove Entry</a> | <a href="/admin/remove?nom={{ nom.id }}&user={{ nom.creator.id }}">Remove Entry and Ban User</a>
+        <br/>
+    {% endfor %}
+{% endfor %}
+
+{% endblock %}

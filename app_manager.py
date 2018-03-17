@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail
+from flask_basicauth import BasicAuth
 from itsdangerous import URLSafeTimedSerializer
 
 #Set up SQL app
@@ -13,5 +14,7 @@ db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 
 mail = Mail(app)
+
+basic_auth = BasicAuth(app)
 
 ts = URLSafeTimedSerializer(app.config["SECRET_KEY"])

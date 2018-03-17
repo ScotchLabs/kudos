@@ -1,4 +1,7 @@
 {% from "_formhelpers.html" import render_field %}
+{% extends "layout.html" %}
+
+{% block body %}
 
 This is where you <b>sign up</b>
 
@@ -8,3 +11,5 @@ This is where you <b>sign up</b>
     {{ render_field(form.password) }}
     <input type="submit" value="Register">
 </form>
+
+{% endblock %}

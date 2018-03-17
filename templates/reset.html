@@ -1,4 +1,7 @@
 {% from "_formhelpers.html" import render_field %}
+{% extends "layout.html" %}
+
+{% block body %}
 
 This is where you <b>request a password reset</b>
 
@@ -7,3 +10,5 @@ This is where you <b>request a password reset</b>
     {{ render_field(form.username) }}
     <input type="submit" value="Go">
 </form>
+
+{% endblock %}

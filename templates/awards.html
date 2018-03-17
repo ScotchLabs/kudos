@@ -1,0 +1,22 @@
+{% from "_formhelpers.html" import render_errors %}
+{% extends "layout.html" %}
+
+{% block body %}
+
+<h1>Awards!</h1>
+Enter a nomination in one of the text boxes below and click to submit!
+{% for award in awards %}
+    <h2>{{ award.name }}</h2>
+    {% for nom in award.nominations %}
+        {{ nom.name }}
+        <br/>
+    {% endfor %}
+    <form method="POST" action="/awards?award={{ award.id }}">
+        {{ form.csrf_token }}
+        {{ form.entry(size=30) }}
+        <input type="submit" value="Nominate!">
+        {{ render_errors(form.entry) }}
+    </form>
+{% endfor %}
+
+{% endblock %}
