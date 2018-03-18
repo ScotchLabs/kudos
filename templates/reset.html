@@ -1,14 +1,19 @@
-{% from "_formhelpers.html" import render_field %}
+{% from "_formhelpers.html" import render_errors %}
 {% extends "layout.html" %}
 
 {% block body %}
 
-This is where you <b>request a password reset</b>
+<h1>Request a password reset</h1>
+
+Enter your username below and you will be emailed a reset link.
+<br><br>
 
 <form method="POST">
-    {{ form.csrf_token }}
-    {{ render_field(form.username) }}
-    <input type="submit" value="Go">
+        {{ form.csrf_token }}
+        {{ form.username.label }} <br>
+        {{ form.username() }}
+        <input type="submit" value="Submit">
+        {{ render_errors(form.username) }}
 </form>
 
 {% endblock %}

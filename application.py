@@ -39,7 +39,7 @@ def signup():
         send_email(user.email, subject, html)
 
         flash("Account created! Please click the confirmation link sent to "
-              "your email")
+              "your email", "success")
 
         return redirect(url_for('index'))
 
@@ -64,7 +64,7 @@ def confirm_email(token):
     db.session.add(user)
     db.session.commit()
 
-    flash("Email confirmed! Sign in!")
+    flash("Email confirmed! Sign in!", "success")
 
     return redirect(url_for('signin'))
 
@@ -87,7 +87,7 @@ def new_link(token):
 
     send_email(email, subject, html)
 
-    flash("New confirmation link sent, check your email!")
+    flash("New confirmation link sent, check your email!", "success")
 
     return redirect(url_for('index'))
 
@@ -99,20 +99,21 @@ def signin():
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first_or_404()
         if not user.email_confirmed:
-            flash("Please click the confirmation link sent to your email first")
+            flash("Please click the confirmation link sent to your email first",
+                  "error")
             return redirect(url_for("signin"))
         if user.is_correct_password(form.password.data):
             if user.banned:
-                flash("Your account has been banned")
+                flash("Your account has been banned", "error")
                 return redirect(url_for("signin"))
             login_user(user, remember=True)
-            flash('Logged in successfully')
+            flash("Logged in successfully", "success")
             next_url = request.args.get('next')
             if not is_safe_url(next_url):
                 return abort(400)
             return redirect(next_url or url_for('index'))
         else:
-            flash('Password incorrect, try again')
+            flash("Password incorrect, try again", "error")
             return redirect(url_for('signin'))
     return render_template('signin.html', form=form)
 
@@ -120,7 +121,7 @@ def signin():
 @login_required
 def signout():
     logout_user()
-    flash("Logged out")
+    flash("Logged out", "success")
     return redirect(url_for('index'))
 
 @app.route('/reset', methods=["GET", "POST"])
@@ -144,7 +145,7 @@ def reset():
 
         send_email(user.email, subject, html)
 
-        flash("Password reset link sent to your email address")
+        flash("A password reset link has sent to your email address", "success")
 
         return redirect(url_for('index'))
     return render_template('reset.html', form=form)
@@ -168,7 +169,7 @@ def reset_with_token(token):
         db.session.add(user)
         db.session.commit()
 
-        flash("Password reset successfully!")
+        flash("Password reset successfully! Sign in!", "success")
 
         return redirect(url_for('signin'))
 
@@ -184,10 +185,10 @@ def change_password():
             db.session.add(current_user)
             db.session.commit()
             login_user(current_user, remember=True)
-            flash("Password changed!")
+            flash("Password changed!", "success")
             return redirect(url_for('index'))
         else:
-            flash("Current password incorrect, try again")
+            flash("Current password incorrect, try again", "error")
 
     return render_template('change_password.html', form=form)
 
@@ -203,7 +204,7 @@ def awards():
         award.nominations.append(Nomination(name=form.entry.data, creator=current_user))
         db.session.add(award)
         db.session.commit()
-        flash("Nomination successful!")
+        flash("Nomination successful!", "success")
         return redirect(url_for("awards"))
     return render_template('nominations.html', form=form, awards=Award.query.all())
 
@@ -251,7 +252,7 @@ def ban():
         user.ban()
         db.session.add(user)
         db.session.commit()
-        flash("Banned %s" % user.username)
+        flash("Banned %s" % user.username, "success")
         return redirect(url_for("admin"))
     uform = UnbanForm()
     return render_template("admin.html", bform=bform, uform=uform,
@@ -266,7 +267,7 @@ def unban():
         user.unban()
         db.session.add(user)
         db.session.commit()
-        flash("Unbanned %s" % user.username)
+        flash("Unbanned %s" % user.username, "success")
         return redirect(url_for("admin"))
     bform = BanForm()
     return render_template("admin.html", bform=bform, uform=uform,
@@ -287,13 +288,13 @@ def remove():
         subject = "Inappropriate Content Warning"
         html = render_template('email/warning.html')
         send_email(user.email, subject, html)
-        flash("Warning sent to %s" % user.username)
+        flash("Warning sent to %s" % user.username, "success")
     if b is not None:
         user = User.query.filter_by(id=b).first_or_404()
         user.ban()
         db.session.add(user)
         db.session.commit()
-        flash("Banned %s" % user.username)
+        flash("Banned %s" % user.username, "success")
     return redirect(url_for("admin"))
 
 @app.route("/admin/setphase", methods=["GET"])
@@ -305,12 +306,12 @@ def set_phase():
         if p != 0 and p != 1:
             abort(404)
         phase = p
-        flash("Phase changed to %s" % ("nominating", "voting")[p])
+        flash("Phase changed to %s" % ("nominating", "voting")[p], "success")
     return redirect(url_for("admin"))
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    return render_template("index.html")
+    return render_template("index.html", phase=phase)
 
 def send_email(email, subject, html):
     msg = Message(subject, recipients=[email], html=html)
