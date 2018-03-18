@@ -1,5 +1,5 @@
 # kudos
-Application to run Kudos Awards for Scotch'n'Soda Theatre
+Application to run the Kudos Awards for Scotch'n'Soda Theatre
 
 # Config
 Specify the following attributes in `config.py`:
