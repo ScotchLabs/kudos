@@ -1,13 +1,16 @@
-from flask import redirect, render_template, url_for, send_file, abort, flash, request
+from flask import redirect, render_template, url_for, send_file, abort, flash, request, jsonify
 from flask_login import login_user, logout_user, current_user, login_required
 from flask_mail import Message
 from urllib.parse import urlparse, urljoin
 import itsdangerous
+import json
 from app_manager import app, db, ts, mail, basic_auth
 from forms import (SignupForm, LoginForm, UsernameForm, ResetPasswordForm,
                    ChangePasswordForm, NominationForm, BanForm, UnbanForm)
 from models import User, Award, Nomination
 import login_manager # just to run initialization
+
+phase = 1 # 0 is nominations, 1 is voting
 
 @app.route('/signup', methods=["GET", "POST"])
 def signup():
@@ -191,6 +194,9 @@ def change_password():
 @app.route("/awards", methods=["GET", "POST"])
 @login_required
 def awards():
+    if phase == 1:
+        return render_template("voting.html", awards=Award.query.all())
+    # else: nominations
     form = NominationForm()
     if form.validate_on_submit():
         award = Award.query.filter_by(id=int(request.args.get('award'))).first_or_404()
@@ -199,7 +205,34 @@ def awards():
         db.session.commit()
         flash("Nomination successful!")
         return redirect(url_for("awards"))
-    return render_template('awards.html', form=form, awards=Award.query.all())
+    return render_template('nominations.html', form=form, awards=Award.query.all())
+
+@app.route("/submit_vote", methods=["POST"])
+@login_required
+def submit_vote():
+    result = { "success" : 0,
+               "message" : "An error occurred" }
+    nom_id = request.form["nom"]
+    try:
+        if nom_id is None:
+            raise ValueError
+        nom_id = int(nom_id)
+    except ValueError:
+        return json.dumps(result), 200
+    nom = Nomination.query.filter_by(id=nom_id).first()
+    if nom is None:
+        return json.dumps(result), 200
+    for sel in current_user.selections:
+        if sel in nom.award.nominations:
+            # ensure there is at most one vote per category
+            current_user.selections.remove(sel)
+            result["no_vote"] = str(sel.id)
+    nom.voters.append(current_user)
+    db.session.commit()
+    result["success"] = 1
+    result["message"] = "Vote submitted"
+    result["vote"] = str(nom.id)
+    return json.dumps(result), 200
 
 @app.route("/admin", methods=["GET"])
 @basic_auth.required
@@ -207,7 +240,7 @@ def admin():
     bform = BanForm()
     uform = UnbanForm()
     return render_template("admin.html", bform=bform, uform=uform,
-                           awards=Award.query.all())
+                           awards=Award.query.all(), phase=phase)
 
 @app.route("/admin/ban", methods=["POST"])
 @basic_auth.required
@@ -222,7 +255,7 @@ def ban():
         return redirect(url_for("admin"))
     uform = UnbanForm()
     return render_template("admin.html", bform=bform, uform=uform,
-                           awards=Award.query.all())
+                           awards=Award.query.all(), phase=phase)
 
 @app.route("/admin/unban", methods=["POST"])
 @basic_auth.required
@@ -237,23 +270,42 @@ def unban():
         return redirect(url_for("admin"))
     bform = BanForm()
     return render_template("admin.html", bform=bform, uform=uform,
-                           awards=Award.query.all())
+                           awards=Award.query.all(), phase=phase)
 
 @app.route("/admin/remove", methods=["GET"])
 @basic_auth.required
 def remove():
-    n = request.args.get('nom')
-    u = request.args.get('user')
+    n = request.args.get('nom', type=int)
+    w = request.args.get('warn', type=int)
+    b = request.args.get('ban', type=int)
     if n is not None:
-        nom = Nomination.query.filter_by(id=int(n)).first_or_404()
+        nom = Nomination.query.filter_by(id=n).first_or_404()
         db.session.delete(nom)
         db.session.commit()
-    if u is not None:
-        user = User.query.filter_by(id=int(u)).first_or_404()
+    if w is not None:
+        user = User.query.filter_by(id=w).first_or_404()
+        subject = "Inappropriate Content Warning"
+        html = render_template('email/warning.html')
+        send_email(user.email, subject, html)
+        flash("Warning sent to %s" % user.username)
+    if b is not None:
+        user = User.query.filter_by(id=b).first_or_404()
         user.ban()
         db.session.add(user)
         db.session.commit()
         flash("Banned %s" % user.username)
+    return redirect(url_for("admin"))
+
+@app.route("/admin/setphase", methods=["GET"])
+@basic_auth.required
+def set_phase():
+    global phase
+    p = request.args.get('phase', type=int)
+    if p is not None:
+        if p != 0 and p != 1:
+            abort(404)
+        phase = p
+        flash("Phase changed to %s" % ("nominating", "voting")[p])
     return redirect(url_for("admin"))
 
 @app.route("/", methods=["GET", "POST"])

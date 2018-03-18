@@ -1,0 +1,41 @@
+{% from "_formhelpers.html" import render_errors %}
+{% extends "layout.html" %}
+
+{% block body %}
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>
+    function submit_vote(click_id) {
+        $.post('/submit_vote', {nom: click_id}, function (text) {
+            let data = JSON.parse(text);
+            if (data["success"] === 1) {
+                let no_vote_id = data["no_vote"];
+                let vote_id = data["vote"];
+                $("button[name=nom" + no_vote_id + "]").css("background-color", "buttonface");
+                $("button[name=nom" + vote_id + "]").css("background-color", "lightgreen");
+            } else {
+                $("#vote-error").text(data["message"]);
+            }
+        });
+        return false;
+    }
+</script>
+
+<div id="vote-error"></div>
+
+<h1>Awards!</h1>
+Use the buttons below to vote for your favorite in each category!
+{% for award in awards %}
+    <h2>{{ award.name }}</h2>
+    {% for nom in award.nominations %}
+        {% if nom in current_user.selections %}
+            <button name="nom{{ nom.id }}" id="{{ nom.id }}" onclick="submit_vote(this.id)" style="background-color: lightgreen">Vote!</button>
+        {% else %}
+            <button name="nom{{ nom.id }}" id="{{ nom.id }}" onclick="submit_vote(this.id)" style="background-color: buttonface">Vote!</button>
+        {% endif %}
+        {{ nom.name }}
+        <br/>
+    {% endfor %}
+{% endfor %}
+
+{% endblock %}

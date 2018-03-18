@@ -3,6 +3,11 @@ from flask_login import UserMixin
 import time
 from app_manager import db, bcrypt
 
+users = db.Table('users',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('nom_id', db.Integer, db.ForeignKey('nomination.id'), primary_key=True)
+)
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(16), unique=True, nullable=False)
@@ -65,8 +70,12 @@ class Nomination(db.Model):
     name = db.Column(db.String(128), nullable=False)
     award_id = db.Column(db.Integer, db.ForeignKey('award.id'))
     creator = db.relationship("User", backref="entries")
-    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'),
-        nullable=False)
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    voters = db.relationship("User", secondary=users, backref=db.backref("selections"))
+
+    @property
+    def votes(self):
+        return len(self.voters)
 
     def __repr__(self):
         return '<Nomination %r>' % self.id

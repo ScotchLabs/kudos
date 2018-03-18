@@ -3,6 +3,14 @@
 
 {% block body %}
 
+{% if phase == 0 %}
+    <a href="/admin/setphase?phase=1"><input type="submit" value="Switch to voting phase"/></a>
+{% else %}
+    <a href="/admin/setphase?phase=0"><input type="submit" value="Switch to nominating phase"/></a>
+{% endif %}
+
+<br/><br/>
+
 <form method="POST" action="/admin/ban">
     {{ bform.csrf_token }}
     {{ bform.username() }}
@@ -21,7 +29,7 @@
 {% for award in awards %}
     <h2>{{ award.name }}</h2>
     {% for nom in award.nominations %}
-        {{ nom.name }} | {{ nom.creator.username }} | <a href="/admin/remove?nom={{ nom.id }}">Remove Entry</a> | <a href="/admin/remove?nom={{ nom.id }}&user={{ nom.creator.id }}">Remove Entry and Ban User</a>
+        <b>{{ nom.votes }} votes</b> | {{ nom.name }} | {{ nom.creator.username }} | <a href="/admin/remove?nom={{ nom.id }}">Remove</a> | <a href="/admin/remove?nom={{ nom.id }}&warn={{ nom.creator.id }}">Remove and Warn</a> | <a href="/admin/remove?nom={{ nom.id }}&ban={{ nom.creator.id }}">Remove and Ban</a>
         <br/>
     {% endfor %}
 {% endfor %}
