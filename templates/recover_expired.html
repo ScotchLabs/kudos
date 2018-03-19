@@ -1,7 +1,79 @@
-{% extends "layout.html" %}
+<!DOCTYPE HTML>
+<!--
+    Alpha by HTML5 UP
+    html5up.net | @ajlkn
+    Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+    <head>
+        <title>Expired | Kudos</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <!--[if lte IE 8]><script src="/static/assets/js/ie/html5shiv.js"></script><![endif]-->
+        <link rel="stylesheet" href="/static/assets/css/main.css" />
+        <!--[if lte IE 8]><link rel="stylesheet" href="/static/assets/css/ie8.css" /><![endif]-->
+        <link rel="icon" href="/static/images/oscar.png"/>
+    </head>
+    <body>
+        <div id="page-wrapper">
 
-{% block body %}
+            <!-- Header -->
+                <header id="header">
+                    <h1><a href="{{ url_for('index') }}">Kudos</a> by Scotch'n'Soda Theatre</h1>
+                    <nav id="nav">
+                        <ul>
+                            <li><a href="{{ url_for('index') }}">Home</a></li>
+                            {% if current_user.is_authenticated %}
+                                <li><a href="{{ url_for('awards') }}">Awards</a></li>
+                                <li>
+                                    <a class="icon fa-angle-down">{{ current_user.username }}</a>
+                                    <ul>
+                                        <li><a href="{{ url_for('change_password') }}">Change Password</a></li>
+                                        <li><a href="{{ url_for('signout') }}">Sign Out</a></li>
+                                    </ul>
+                                </li>
+                            {% else %}
+                                <li><a href="{{ url_for('signin') }}">Sign In</a></li>
+                                <li><a href="{{ url_for('signup') }}" class="button">Sign Up</a></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </header>
 
-Uh oh! Your link expired! Please request a new one.
+            <!-- Main -->
+                <section id="main" class="container 75%">
+                    <header>
+                        <h2>Uh oh!</h2>
+                        <p>Expired Link</p>
+                    </header>
+                    <div class="box">
+                        <p>Looks like your password reset link has expired. Please request a new one.</p>
+                    </div>
+                </section>
 
-{% endblock %}
+            <!-- Footer -->
+                <footer id="footer">
+                    <ul class="icons">
+                        <li><a href="https://www.facebook.com/snstheatre/" class="icon fa-facebook" target="_blank"><span class="label">Facebook</span></a></li>
+                        <li><a href="https://www.instagram.com/scotchnsodatheatre" class="icon fa-instagram" target="_blank"><span class="label">Instagram</span></a></li>
+                        <li><a href="https://www.twitter.com/snstheatre" class="icon fa-twitter" target="_blank"><span class="label">Twitter</span></a></li>
+                        <li><a href="https://github.com/gseastream/kudos" class="icon fa-github" target="_blank"><span class="label">Github</span></a></li>
+                    </ul>
+                    <ul class="copyright">
+                        <li>&copy; Scotch'n'Soda Theatre</li><li>Website: Grant Seastream</li><li>Design: <a href="http://html5up.net" target="_blank">HTML5 UP</a></li>
+                    </ul>
+                </footer>
+
+        </div>
+
+        <!-- Scripts -->
+            <script src="/static/assets/js/jquery.min.js"></script>
+            <script src="/static/assets/js/jquery.dropotron.min.js"></script>
+            <script src="/static/assets/js/jquery.scrollgress.min.js"></script>
+            <script src="/static/assets/js/skel.min.js"></script>
+            <script src="/static/assets/js/util.js"></script>
+            <!--[if lte IE 8]><script src="/static/assets/js/ie/respond.min.js"></script><![endif]-->
+            <script src="/static/assets/js/main.js"></script>
+
+    </body>
+</html>

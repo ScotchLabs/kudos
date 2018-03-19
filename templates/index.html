@@ -1,21 +1,159 @@
-{% extends "layout.html" %}
+<!DOCTYPE HTML>
+<!--
+    Alpha by HTML5 UP
+    html5up.net | @ajlkn
+    Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+    <head>
+        <title>Kudos | Scotch'n'Soda</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <!--[if lte IE 8]><script src="/static/assets/js/ie/html5shiv.js"></script><![endif]-->
+        <link rel="stylesheet" href="/static/assets/css/main.css" />
+        <!--[if lte IE 8]><link rel="stylesheet" href="/static/assets/css/ie8.css" /><![endif]-->
+        <link rel="icon" href="/static/images/oscar.png"/>
+        <style>
+            .alert {
+                padding: 20px;
+                color: white;
+                opacity: 1;
+                transition: opacity 0.6s;
+                margin-bottom: 15px;
+            }
 
-{% block body %}
+            .alert.success {background-color: #4CAF50;}
+            .alert.info {background-color: #2196F3;}
+            .alert.warning {background-color: #ff9800;}
+            .alert.error {background-color: #f44336;}
 
-<h1>Welcome!</h1>
-{% if current_user.is_authenticated %}
-    Hi {{ current_user.username }}!
-    {% if phase == 0 %}
-        <p>Submit some <a href="{{ url_for('awards') }}">nominations</a>!</p>
-    {% else %}
-        <p>Now it's time to <a href="{{ url_for('awards') }}">vote</a>!</p>
-    {% endif %}
-    <p>Click here to <a href="{{ url_for('change_password') }}">change your password</a>.</p>
-    <p>Click here to <a href="{{ url_for('signout') }}">log out</a>.</p>
-{% else %}
-    <p>Welcome! <a href="{{ url_for('signup') }}">Create an account</a>!</p>
-    <p>Already have one? <a href="{{ url_for('signin') }}">Log in</a>!</p>
-    <p>Forget your password? <a href="{{ url_for('reset') }}">Click here</a>.</p>
-{% endif %}
+            .closebtn {
+                margin-left: 15px;
+                color: white;
+                font-weight: bold;
+                float: right;
+                font-size: 22px;
+                line-height: 20px;
+                cursor: pointer;
+                transition: 0.3s;
+            }
 
-{% endblock %}
+            .closebtn:hover {
+                color: black;
+            }
+        </style>
+
+        <script>
+        // Get all elements with class="closebtn"
+        var close = document.getElementsByClassName("closebtn");
+        var i;
+
+        // Loop through all close buttons
+        for (i = 0; i < close.length; i++) {
+            // When someone clicks on a close button
+            close[i].onclick = function(){
+
+                // Get the parent of <span class="closebtn"> (<div class="alert">)
+                var div = this.parentElement;
+
+                // Set the opacity of div to 0 (transparent)
+                div.style.opacity = "0";
+
+                // Hide the div after 600ms (the same amount of milliseconds it takes to fade out)
+                setTimeout(function(){ div.style.display = "none"; }, 600);
+            }
+        }
+        </script>
+    </head>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <script>
+          var messages = {{ messages | safe }};
+          for (var i=0; i<messages.length; i++) {
+            alert(messages[i]);
+          }
+        </script>
+      {% endif %}
+    {% endwith %}
+    <body class="landing">
+        <div id="page-wrapper">
+
+            <!-- Header -->
+                <header id="header" class="alt">
+                    <h1><a href="{{ url_for('index') }}">Kudos</a> by Scotch'n'Soda Theatre</h1>
+                    <nav id="nav">
+                        <ul>
+                            <li><a href="{{ url_for('index') }}">Home</a></li>
+                            {% if current_user.is_authenticated %}
+                                <li><a href="{{ url_for('awards') }}">Awards</a></li>
+                                <li>
+                                    <a class="icon fa-angle-down">{{ current_user.username }}</a>
+                                    <ul>
+                                        <li><a href="{{ url_for('change_password') }}">Change Password</a></li>
+                                        <li><a href="{{ url_for('signout') }}">Sign Out</a></li>
+                                    </ul>
+                                </li>
+                            {% else %}
+                                <li><a href="{{ url_for('signin') }}">Sign In</a></li>
+                                <li><a href="{{ url_for('signup') }}" class="button">Sign Up</a></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </header>
+
+            <!-- Banner -->
+                <section id="banner">
+                    <h2>Kudos Awards!</h2>
+                    <p>Celebrating the best and the funniest of the 2017-18 Season in Scotch'n'Soda Theatre</p>
+                    <ul class="actions">
+                        {% if current_user.is_authenticated %}
+                            {% if phase == 0 %}
+                                <li><a href="{{ url_for('awards') }}" class="button special">Nominations!</a></li>
+                            {% else %}
+                                <li><a href="{{ url_for('awards') }}" class="button special">Time to vote!</a></li>
+                            {% endif %}
+                        {% else %}
+                            <li><a href="{{ url_for('signup') }}" class="button special">Create an Account</a></li>
+                            <li><a href="{{ url_for('signin') }}" class="button">Sign In</a></li>
+                        {% endif %}
+                    </ul>
+                </section>
+
+            <!-- Footer -->
+                <footer id="footer">
+                    <ul class="icons">
+                        <li><a href="https://www.facebook.com/snstheatre/" class="icon fa-facebook" target="_blank"><span class="label">Facebook</span></a></li>
+                        <li><a href="https://www.instagram.com/scotchnsodatheatre" class="icon fa-instagram" target="_blank"><span class="label">Instagram</span></a></li>
+                        <li><a href="https://www.twitter.com/snstheatre" class="icon fa-twitter" target="_blank"><span class="label">Twitter</span></a></li>
+                        <li><a href="https://github.com/gseastream/kudos" class="icon fa-github" target="_blank"><span class="label">Github</span></a></li>
+                    </ul>
+                    <ul class="copyright">
+                        <li>&copy; Scotch'n'Soda Theatre</li><li>Website: Grant Seastream</li><li>Design: <a href="http://html5up.net" target="_blank">HTML5 UP</a></li>
+                    </ul>
+                </footer>
+
+        </div>
+
+        <!-- Scripts -->
+            <script src="/static/assets/js/jquery.min.js"></script>
+            <script src="/static/assets/js/jquery.dropotron.min.js"></script>
+            <script src="/static/assets/js/jquery.scrollgress.min.js"></script>
+            <script src="/static/assets/js/skel.min.js"></script>
+            <script src="/static/assets/js/util.js"></script>
+            <!--[if lte IE 8]><script src="/static/assets/js/ie/respond.min.js"></script><![endif]-->
+            <script src="/static/assets/js/main.js"></script>
+            <script>
+                var close = document.getElementsByClassName("closebtn");
+                var i;
+
+                for (i = 0; i < close.length; i++) {
+                    close[i].onclick = function(){
+                        var div = this.parentElement;
+                        div.style.opacity = "0";
+                        setTimeout(function(){ div.style.display = "none"; }, 600);
+                    }
+                }
+            </script>
+
+    </body>
+</html>

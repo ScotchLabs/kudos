@@ -2,13 +2,14 @@ from app_manager import db
 from models import User, Award, Nomination
 
 def init_db():
+    db.drop_all()
     db.create_all()
 
-    db.session.query(User).delete()
-    db.session.query(Award).delete()
-    db.session.query(Nomination).delete()
-
     u1 = User(username="gseastre", password="iamgroont", email_confirmed=True)
+    u2 = User(username="fakenews", password="thisisreal", email_confirmed=True)
+    db.session.add(u2)
+    u3 = User(username="bush911", password="obamalover666", email_confirmed=True)
+    db.session.add(u3)
     awards = [Award(name="Best Actor"),
               Award(name="Worst Actor"),
               Award(name="Best Late Show Moment"),

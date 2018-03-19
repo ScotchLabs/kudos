@@ -60,5 +60,5 @@ class ChangePasswordForm(FlaskForm):
         validators=[DataRequired(), Length(min=passmin, max=passmax)])
 
 class NominationForm(FlaskForm):
-    entry = StringField('Nominate',
+    entry = StringField('Nomination',
         validators=[DataRequired(), Length(max=128)])

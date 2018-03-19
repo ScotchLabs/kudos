@@ -1,4 +1,4 @@
-from flask import redirect, render_template, url_for, send_file, abort, flash, request, jsonify
+from flask import redirect, render_template, url_for, send_file, abort, flash, request
 from flask_login import login_user, logout_user, current_user, login_required
 from flask_mail import Message
 from urllib.parse import urlparse, urljoin
@@ -10,7 +10,7 @@ from forms import (SignupForm, LoginForm, UsernameForm, ResetPasswordForm,
 from models import User, Award, Nomination
 import login_manager # just to run initialization
 
-phase = 1 # 0 is nominations, 1 is voting
+phase = 0 # 0 is nominations, 1 is voting
 
 @app.route('/signup', methods=["GET", "POST"])
 def signup():
@@ -153,7 +153,7 @@ def reset():
 @app.route('/reset/<token>', methods=["GET", "POST"])
 def reset_with_token(token):
     try:
-        email = ts.loads(token, salt="recover-key", max_age=1800)
+        email = ts.loads(token, salt="recover-key", max_age=86400)
     except itsdangerous.SignatureExpired:
         return render_template("recover_expired.html")
     except:
@@ -225,14 +225,23 @@ def submit_vote():
         return json.dumps(result), 200
     for sel in current_user.selections:
         if sel in nom.award.nominations:
-            # ensure there is at most one vote per category
+            # take away vote from other nom in this category
+            # clicking same button will simply remove the vote
             current_user.selections.remove(sel)
             result["no_vote"] = str(sel.id)
+            if sel == nom:
+                # we removed the vote, so we are done
+                result["success"] = 1
+                result["message"] = "Vote removed"
+                db.session.commit()
+                return json.dumps(result), 200
+            break
+    # only add vote if it was a different nomination's button
     nom.voters.append(current_user)
-    db.session.commit()
-    result["success"] = 1
+    result["success"] = 2
     result["message"] = "Vote submitted"
     result["vote"] = str(nom.id)
+    db.session.commit()
     return json.dumps(result), 200
 
 @app.route("/admin", methods=["GET"])
