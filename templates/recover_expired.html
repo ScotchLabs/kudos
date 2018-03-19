@@ -13,8 +13,32 @@
         <link rel="stylesheet" href="/static/assets/css/main.css" />
         <!--[if lte IE 8]><link rel="stylesheet" href="/static/assets/css/ie8.css" /><![endif]-->
         <link rel="icon" href="/static/images/oscar.png"/>
+
+        <link rel="stylesheet" href="/static/assets/font-awesome/css/font-awesome.min.css"/>
+        <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+        <link rel="stylesheet" href="/static/assets/dist/css/lobibox.min.css">
+        <script src="/static/assets/dist/js/lobibox.min.js"></script>
+        <script>
+            Lobibox.notify.DEFAULTS = $.extend({}, Lobibox.notify.DEFAULTS, {
+                iconSource: 'fontAwesome'
+            });
+            Lobibox.notify.DEFAULTS = $.extend({}, Lobibox.notify.DEFAULTS, {
+                sound: false
+            });
+        </script>
     </head>
     <body>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <script>
+                        Lobibox.notify("{{ category }}", {
+                            msg: "{{ message }}"
+                        });
+                    </script>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
         <div id="page-wrapper">
 
             <!-- Header -->

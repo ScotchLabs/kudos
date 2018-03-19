@@ -13,69 +13,33 @@
         <link rel="stylesheet" href="/static/assets/css/main.css" />
         <!--[if lte IE 8]><link rel="stylesheet" href="/static/assets/css/ie8.css" /><![endif]-->
         <link rel="icon" href="/static/images/oscar.png"/>
-        <style>
-            .alert {
-                padding: 20px;
-                color: white;
-                opacity: 1;
-                transition: opacity 0.6s;
-                margin-bottom: 15px;
-            }
 
-            .alert.success {background-color: #4CAF50;}
-            .alert.info {background-color: #2196F3;}
-            .alert.warning {background-color: #ff9800;}
-            .alert.error {background-color: #f44336;}
-
-            .closebtn {
-                margin-left: 15px;
-                color: white;
-                font-weight: bold;
-                float: right;
-                font-size: 22px;
-                line-height: 20px;
-                cursor: pointer;
-                transition: 0.3s;
-            }
-
-            .closebtn:hover {
-                color: black;
-            }
-        </style>
-
+        <link rel="stylesheet" href="/static/assets/font-awesome/css/font-awesome.min.css"/>
+        <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+        <link rel="stylesheet" href="/static/assets/dist/css/lobibox.min.css">
+        <script src="/static/assets/dist/js/lobibox.min.js"></script>
         <script>
-        // Get all elements with class="closebtn"
-        var close = document.getElementsByClassName("closebtn");
-        var i;
-
-        // Loop through all close buttons
-        for (i = 0; i < close.length; i++) {
-            // When someone clicks on a close button
-            close[i].onclick = function(){
-
-                // Get the parent of <span class="closebtn"> (<div class="alert">)
-                var div = this.parentElement;
-
-                // Set the opacity of div to 0 (transparent)
-                div.style.opacity = "0";
-
-                // Hide the div after 600ms (the same amount of milliseconds it takes to fade out)
-                setTimeout(function(){ div.style.display = "none"; }, 600);
-            }
-        }
+            Lobibox.notify.DEFAULTS = $.extend({}, Lobibox.notify.DEFAULTS, {
+                iconSource: 'fontAwesome'
+            });
+            Lobibox.notify.DEFAULTS = $.extend({}, Lobibox.notify.DEFAULTS, {
+                sound: false
+            });
         </script>
     </head>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <script>
-          var messages = {{ messages | safe }};
-          for (var i=0; i<messages.length; i++) {
-            alert(messages[i]);
-          }
-        </script>
-      {% endif %}
-    {% endwith %}
+
     <body class="landing">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <script>
+                        Lobibox.notify("{{ category }}", {
+                            msg: "{{ message }}"
+                        });
+                    </script>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
         <div id="page-wrapper">
 
             <!-- Header -->
@@ -142,18 +106,6 @@
             <script src="/static/assets/js/util.js"></script>
             <!--[if lte IE 8]><script src="/static/assets/js/ie/respond.min.js"></script><![endif]-->
             <script src="/static/assets/js/main.js"></script>
-            <script>
-                var close = document.getElementsByClassName("closebtn");
-                var i;
-
-                for (i = 0; i < close.length; i++) {
-                    close[i].onclick = function(){
-                        var div = this.parentElement;
-                        div.style.opacity = "0";
-                        setTimeout(function(){ div.style.display = "none"; }, 600);
-                    }
-                }
-            </script>
 
     </body>
 </html>

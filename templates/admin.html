@@ -1,7 +1,31 @@
 {% from "_formhelpers.html" import render_errors %}
-{% extends "layout.html" %}
 
-{% block body %}
+<!DOCTYPE html>
+<head>
+    <title>Admin | Kudos</title>
+    <link rel="icon" href="/static/images/oscar.png"/>
+    <style>
+      .error {color: red;}
+      .success {color: green;}
+    </style>
+</head>
+<div>
+    <a href="/">Home</a>
+</div>
+<br/>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for category, message in messages %}
+      <li class="{{ category }}">
+      {% if category == "error" %}
+        <strong>Error:</strong>
+      {% endif %}
+      {{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
 
 {% if phase == 0 %}
     <a href="/admin/setphase?phase=1"><input type="submit" value="Switch to voting phase"/></a>
@@ -33,5 +57,3 @@
         <br/>
     {% endfor %}
 {% endfor %}
-
-{% endblock %}
