@@ -41,7 +41,7 @@ Additionally, you may also use whatever GSuite domain you have for Google Mail i
 
 To run this application on AWS Elastic Beanstalk, you must create some config files in the directory `.ebextensions/`:
 
-`.ebextensions/securelistener-clb.config` (assuming https support)
+`.ebextensions/securelistener-clb.config` (assuming https support, using a certificate on ACM)
 ```
 option_settings:
   aws:elb:listener:443:
