@@ -15,7 +15,7 @@
         <link rel="icon" href="/static/images/oscar.png"/>
 
         <link rel="stylesheet" href="/static/assets/font-awesome/css/font-awesome.min.css"/>
-        <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+        <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
         <link rel="stylesheet" href="/static/assets/dist/css/lobibox.min.css">
         <script src="/static/assets/dist/js/lobibox.min.js"></script>
         <script>
@@ -68,10 +68,12 @@
             <!-- Banner -->
                 <section id="banner">
                     <h2>Kudos Awards!</h2>
-                    <p>Celebrating the best and the funniest of the 2017-18 Season in Scotch'n'Soda Theatre</p>
+                    <p>Celebrating the best of the 2017-18 Season in Scotch'n'Soda Theatre</p>
                     <ul class="actions">
                         {% if current_user.is_authenticated %}
                             {% if phase == 0 %}
+                                <li><a href="{{ url_for('awards') }}" class="button special">View Nominees</a></li>
+                            {% elif phase == 1 %}
                                 <li><a href="{{ url_for('awards') }}" class="button special">Nominations!</a></li>
                             {% else %}
                                 <li><a href="{{ url_for('awards') }}" class="button special">Time to vote!</a></li>
@@ -81,6 +83,18 @@
                             <li><a href="{{ url_for('signin') }}" class="button">Sign In</a></li>
                         {% endif %}
                     </ul>
+                </section>
+
+            <!-- Main -->
+                <section id="main" class="container">
+
+                    <section class="box special">
+                        <header class="major">
+                            <h2><b>What are Kudos Awards?</b></h2>
+                            <p>At the end of every year, we celebrate everything we loved about the past season in S'n'S, from the most talented performers to the rulers of the Black Chairs, to be awarded at the semester's Woodscotch. First is a round of nominations, followed by voting. Make an account and sign in to get started!</p>
+                        </header>
+                    </section>
+
                 </section>
 
             <!-- Footer -->

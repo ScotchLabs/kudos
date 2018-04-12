@@ -27,10 +27,14 @@
   {% endif %}
 {% endwith %}
 
-{% if phase == 0 %}
-    <a href="/admin/setphase?phase=1"><input type="submit" value="Switch to voting phase"/></a>
-{% else %}
-    <a href="/admin/setphase?phase=0"><input type="submit" value="Switch to nominating phase"/></a>
+{% if phase != 0 %}
+    <a href="/admin/setphase?phase=0"><input type="submit" value="Switch to static phase"/></a>
+{% endif %}
+{% if phase != 1 %}
+    <a href="/admin/setphase?phase=1"><input type="submit" value="Switch to nominating phase"/></a>
+{% endif %}
+{% if phase != 2 %}
+    <a href="/admin/setphase?phase=2"><input type="submit" value="Switch to voting phase"/></a>
 {% endif %}
 
 <br/><br/>

@@ -25,9 +25,9 @@ class User(db.Model, UserMixin):
         return self._password
 
     @password.setter
-    def _set_password(self, plaintext):
-        self._set_token() # reset the token when you change the password
+    def password(self, plaintext):
         self._password = bcrypt.generate_password_hash(plaintext)
+        self._set_token() # reset the token when you change the password
 
     def is_correct_password(self, plaintext):
         return bcrypt.check_password_hash(self._password, plaintext)
@@ -79,3 +79,11 @@ class Nomination(db.Model):
 
     def __repr__(self):
         return '<Nomination %r>' % self.id
+
+class State(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    # 0 is static, 1 is nominations, 2 is voting
+    phase = db.Column(db.Integer, nullable=False)
+
+    def __repr__(self):
+        return '<State %r>' % self.id

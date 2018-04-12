@@ -1,5 +1,3 @@
-{% from "_formhelpers.html" import render_errors %}
-
 <!DOCTYPE HTML>
 <!--
     Alpha by HTML5 UP
@@ -8,7 +6,7 @@
 -->
 <html>
     <head>
-        <title>Nominations | Kudos</title>
+        <title>Already Confirmed | Kudos</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <!--[if lte IE 8]><script src="/static/assets/js/ie/html5shiv.js"></script><![endif]-->
@@ -67,37 +65,9 @@
                 </header>
 
             <!-- Main -->
-                <section id="main" class="container">
-                    <header>
-                        <h2>Nominations!</h2>
-                        <p>Enter a nomination in one of the text boxes below and click to submit!</p>
-                    </header>
+                <section id="main" class="container 75%">
                     <div class="box">
-                        <span class="image featured"><img src="/static/images/snsbanner.png" alt="" /></span>
-                        {% for award in awards %}
-                            <h2><b>{{ award.name }}</b></h2>
-                            <ul>
-                                {% for nom in award.nominations %}
-                                    <li>{{ nom.name }}</li>
-                                {% endfor %}
-                            </ul>
-                            <form method="POST" action="/awards?award={{ award.id }}">
-                                <div class="row uniform 50%">
-                                    <div class="9u 12u(mobilep)">
-                                        {{ form.csrf_token }}
-                                        {{ form.entry(placeholder=form.entry.label.text) }}
-                                    </div>
-                                    <div class="3u 12u(mobilep)">
-                                        <input type="submit" value="Submit" class="fit" />
-                                    </div>
-                                </div>
-                                {{ render_errors(form.entry) }}
-                            </form>
-                            {% if award != awards[-1] %}
-                                {# Only put lines between awards, not after the last one #}
-                                <hr>
-                            {% endif %}
-                        {% endfor %}
+                        <p>Your email has already been confirmed, silly!</p>
                     </div>
                 </section>
 

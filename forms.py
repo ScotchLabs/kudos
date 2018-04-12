@@ -8,24 +8,24 @@ passmin = 7
 passmax = 128
 
 def available(form, field):
-    user = User.query.filter_by(username=field.data).first()
+    user = User.query.filter_by(username=field.data.lower()).first()
     if user is not None:
         raise ValidationError("Username already exists")
 
 def exists(form, field):
-    user = User.query.filter_by(username=field.data).first()
+    user = User.query.filter_by(username=field.data.lower()).first()
     if user is None:
         raise ValidationError("Username does not exist")
 
 def is_banned(form, field):
     exists(form, field)
-    user = User.query.filter_by(username=field.data).first()
+    user = User.query.filter_by(username=field.data.lower()).first()
     if not user.banned:
         raise ValidationError("User is not banned")
 
 def is_not_banned(form, field):
     exists(form, field)
-    user = User.query.filter_by(username=field.data).first()
+    user = User.query.filter_by(username=field.data.lower()).first()
     if user.banned:
         raise ValidationError("User is already banned")
 

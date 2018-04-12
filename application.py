@@ -7,10 +7,10 @@ import json
 from app_manager import app, db, ts, mail, basic_auth
 from forms import (SignupForm, LoginForm, UsernameForm, ResetPasswordForm,
                    ChangePasswordForm, NominationForm, BanForm, UnbanForm)
-from models import User, Award, Nomination
+from models import User, Award, Nomination, State
 import login_manager # just to run initialization
 
-phase = 0 # 0 is nominations, 1 is voting
+application = app # name needed for eb
 
 @app.route('/signup', methods=["GET", "POST"])
 def signup():
@@ -18,7 +18,7 @@ def signup():
         return redirect(url_for('index'))
     form = SignupForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, password=form.password.data)
+        user = User(username=form.username.data.lower(), password=form.password.data)
         db.session.add(user)
         db.session.commit()
 
@@ -45,7 +45,7 @@ def signup():
 
     return render_template('signup.html', form=form)
 
-@app.route('/confirm/<token>')
+@app.route('/confirm/<token>', methods=["GET"])
 def confirm_email(token):
     try:
         email = ts.loads(token, salt="email-confirm-key", max_age=86400)
@@ -57,7 +57,7 @@ def confirm_email(token):
     user = User.query.filter_by(email=email).first_or_404()
 
     if user.email_confirmed == True:
-        return "Your email has already been confirmed, silly!"
+        return render_template("already_confirmed.html", token=token)
 
     user.email_confirmed = True
 
@@ -68,7 +68,7 @@ def confirm_email(token):
 
     return redirect(url_for('signin'))
 
-@app.route("/newlink/<token>")
+@app.route("/newlink/<token>", methods=["GET"])
 def new_link(token):
     email = ts.loads(token, salt="email-confirm-key") # no max_age
 
@@ -97,7 +97,7 @@ def signin():
         return redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first_or_404()
+        user = User.query.filter_by(username=form.username.data.lower()).first_or_404()
         if not user.email_confirmed:
             flash("Please click the confirmation link sent to your email first",
                   "error")
@@ -117,7 +117,7 @@ def signin():
             return redirect(url_for('signin'))
     return render_template('signin.html', form=form)
 
-@app.route('/signout')
+@app.route('/signout', methods=["GET"])
 @login_required
 def signout():
     logout_user()
@@ -128,7 +128,7 @@ def signout():
 def reset():
     form = UsernameForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first_or_404()
+        user = User.query.filter_by(username=form.username.data.lower()).first_or_404()
 
         subject = "Password reset requested"
 
@@ -195,7 +195,9 @@ def change_password():
 @app.route("/awards", methods=["GET", "POST"])
 @login_required
 def awards():
-    if phase == 1:
+    if phase() == 0:
+        return render_template("nominees.html", awards=Award.query.all())
+    if phase() == 2:
         return render_template("voting.html", awards=Award.query.all())
     # else: nominations
     form = NominationForm()
@@ -250,14 +252,14 @@ def admin():
     bform = BanForm()
     uform = UnbanForm()
     return render_template("admin.html", bform=bform, uform=uform,
-                           awards=Award.query.all(), phase=phase)
+                           awards=Award.query.all(), phase=phase())
 
 @app.route("/admin/ban", methods=["POST"])
 @basic_auth.required
 def ban():
     bform = BanForm()
     if bform.validate_on_submit():
-        user = User.query.filter_by(username=bform.username.data).first_or_404()
+        user = User.query.filter_by(username=bform.username.data.lower()).first_or_404()
         user.ban()
         db.session.add(user)
         db.session.commit()
@@ -265,14 +267,14 @@ def ban():
         return redirect(url_for("admin"))
     uform = UnbanForm()
     return render_template("admin.html", bform=bform, uform=uform,
-                           awards=Award.query.all(), phase=phase)
+                           awards=Award.query.all(), phase=phase())
 
 @app.route("/admin/unban", methods=["POST"])
 @basic_auth.required
 def unban():
     uform = UnbanForm()
     if uform.validate_on_submit():
-        user = User.query.filter_by(username=uform.username.data).first_or_404()
+        user = User.query.filter_by(username=uform.username.data.lower()).first_or_404()
         user.unban()
         db.session.add(user)
         db.session.commit()
@@ -280,7 +282,7 @@ def unban():
         return redirect(url_for("admin"))
     bform = BanForm()
     return render_template("admin.html", bform=bform, uform=uform,
-                           awards=Award.query.all(), phase=phase)
+                           awards=Award.query.all(), phase=phase())
 
 @app.route("/admin/remove", methods=["GET"])
 @basic_auth.required
@@ -309,21 +311,21 @@ def remove():
 @app.route("/admin/setphase", methods=["GET"])
 @basic_auth.required
 def set_phase():
-    global phase
     p = request.args.get('phase', type=int)
     if p is not None:
-        if p != 0 and p != 1:
+        if not p in (0,1,2):
             abort(404)
-        phase = p
-        flash("Phase changed to %s" % ("nominating", "voting")[p], "success")
+        db.session.query(State).first().phase = p
+        db.session.commit()
+        flash("Phase changed to %s" % ("static", "nominating", "voting")[p], "success")
     return redirect(url_for("admin"))
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/", methods=["GET"])
 def index():
-    return render_template("index.html", phase=phase)
+    return render_template("index.html", phase=phase())
 
 def send_email(email, subject, html):
-    msg = Message(subject, recipients=[email], html=html)
+    msg = Message("[KUDOS] " + subject, recipients=[email], html=html)
     mail.send(msg)
 
 def is_safe_url(target):
@@ -332,5 +334,8 @@ def is_safe_url(target):
     return (test_url.scheme in ('http', 'https') and
             ref_url.netloc == test_url.netloc)
 
+def phase():
+    return State.query.first().phase
+
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True) # should only be on debug when run locally, not on eb
