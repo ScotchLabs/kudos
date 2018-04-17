@@ -75,13 +75,13 @@
                     <div class="box">
                         <span class="image featured"><img src="/static/images/snsbanner.png" alt="" /></span>
                         {% for award in awards %}
-                            <h2><b>{{ award.name }}</b></h2>
+                            <h2><b style="color: #d77a3d">{{ award.name }}</b></h2>
                             <ul class="actions">
                                 {% for nom in award.nominations %}
                                     {% if nom in current_user.selections %}
-                                        <li><a class="button alt icon fa-check small" name="nom{{ nom.id }}" id="{{ nom.id }}" onclick="submit_vote(this.id)" style="background-color: lightgreen">Vote</a> {{ nom.name }}</li>
+                                        <li style="font-size: 120%"><a class="button alt icon fa-check small" name="nom{{ nom.id }}" id="{{ nom.id }}" onclick="submit_vote(this.id)" style="background-color: lightgreen">Vote</a> {{ nom.name }}</li>
                                     {% else %}
-                                        <li><a class="button alt icon fa-check small" name="nom{{ nom.id }}" id="{{ nom.id }}" onclick="submit_vote(this.id)" style="background-color: transparent;">Vote</a> {{ nom.name }}</li>
+                                        <li style="font-size: 120%"><a class="button alt icon fa-check small" name="nom{{ nom.id }}" id="{{ nom.id }}" onclick="submit_vote(this.id)" style="background-color: transparent;">Vote</a> {{ nom.name }}</li>
                                     {% endif %}
                                     <br/>
                                 {% endfor %}

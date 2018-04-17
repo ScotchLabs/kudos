@@ -75,10 +75,10 @@
                     <div class="box">
                         <span class="image featured"><img src="/static/images/snsbanner.png" alt="" /></span>
                         {% for award in awards %}
-                            <h2><b>{{ award.name }}</b></h2>
+                            <h2><b style="color: #d77a3d">{{ award.name }}</b></h2>
                             <ul>
                                 {% for nom in award.nominations %}
-                                    <li>{{ nom.name }}</li>
+                                    <li style="font-size: 120%">{{ nom.name }}</li>
                                 {% endfor %}
                             </ul>
                             <form method="POST" action="/awards?award={{ award.id }}">
