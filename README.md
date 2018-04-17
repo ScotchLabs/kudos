@@ -56,3 +56,5 @@ container_commands:
   01_wsgi_pass_headers:
     command: 'echo "WSGIPassAuthorization On" >> ../wsgi.conf'
 ```
+
+If using the EB CLI, you will also need to at least create an empty `.ebignore` file, otherwise `.gitignore` will be used by default, which will ignore your `config.py` file. You may of course also add to this file whatever else you want to ignore.
