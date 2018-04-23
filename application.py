@@ -23,20 +23,7 @@ def signup():
         db.session.commit()
 
         # Now we'll send the email confirmation link
-        subject = "Confirm your email"
-
-        token = ts.dumps(user.email, salt='email-confirm-key')
-
-        confirm_url = url_for(
-            'confirm_email',
-            token=token,
-            _external=True)
-
-        html = render_template(
-            'email/activate.html',
-            confirm_url=confirm_url)
-
-        send_email(user.email, subject, html)
+        send_confirm_link(user.email)
 
         flash("Account created! Please click the confirmation link sent to "
               "your email", "success")
@@ -70,26 +57,23 @@ def confirm_email(token):
 
 @app.route("/newlink/<token>", methods=["GET"])
 def new_link(token):
-    email = ts.loads(token, salt="email-confirm-key") # no max_age
-
-    subject = "Confirm your email"
-
-    token = ts.dumps(email, salt='email-confirm-key')
-
-    confirm_url = url_for(
-        'confirm_email',
-        token=token,
-        _external=True)
-
-    html = render_template(
-        'email/activate.html',
-        confirm_url=confirm_url)
-
-    send_email(email, subject, html)
-
+    email = ts.loads(token, salt="email-confirm-key") # ignore age here
+    send_confirm_link(email)
     flash("New confirmation link sent, check your email!", "success")
-
     return redirect(url_for('index'))
+
+@app.route('/resend', methods=["GET", "POST"])
+def resend():
+    form = UsernameForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data.lower()).first_or_404()
+        if user.email_confirmed == True:
+            flash("Your email is already confirmed!", "error")
+            return render_template('resend.html', form=form)
+        send_confirm_link(user.email)
+        flash("New confirmation link sent, check your email!", "success")
+        return redirect(url_for('index'))
+    return render_template('resend.html', form=form)
 
 @app.route('/signin', methods=["GET", "POST"])
 def signin():
@@ -329,6 +313,22 @@ def set_phase():
 @app.route("/", methods=["GET"])
 def index():
     return render_template("index.html", phase=phase())
+
+def send_confirm_link(email):
+    subject = "Confirm your email"
+
+    token = ts.dumps(email, salt='email-confirm-key')
+
+    confirm_url = url_for(
+        'confirm_email',
+        token=token,
+        _external=True)
+
+    html = render_template(
+        'email/activate.html',
+        confirm_url=confirm_url)
+
+    send_email(email, subject, html)
 
 def send_email(email, subject, html):
     msg = Message("[KUDOS] " + subject, recipients=[email], html=html)

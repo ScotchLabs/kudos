@@ -8,7 +8,7 @@
 -->
 <html>
     <head>
-        <title>Sign In | Kudos</title>
+        <title>Reset | Kudos</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <!--[if lte IE 8]><script src="/static/assets/js/ie/html5shiv.js"></script><![endif]-->
@@ -69,8 +69,8 @@
             <!-- Main -->
                 <section id="main" class="container 75%">
                     <header>
-                        <h2>Sign In</h2>
-                        <p>Enter your login information below</p>
+                        <h2>Resend Confirmation Email</h2>
+                        <p>Enter your username below and you will be emailed a new confirmation link</p>
                     </header>
                     <div class="box">
                         <form method="POST">
@@ -83,18 +83,8 @@
                             </div>
                             <div class="row uniform 50%">
                                 <div class="12u">
-                                    {{ form.password(placeholder=form.password.label.text) }}
-                                    {{ render_errors(form.password) }}
-                                </div>
-                            </div>
-                            <p>
-                                <a href="{{ url_for('reset') }}">Forgot Password</a><br>
-                                <a href="{{ url_for('resend') }}">Resend Email</a>
-                            </p>
-                            <div class="row uniform 50%">
-                                <div class="12u">
                                     <ul class="actions align-center">
-                                        <li><input type="submit" value="Sign In"></li>
+                                        <li><input type="submit" value="Submit"></li>
                                     </ul>
                                 </div>
                             </div>

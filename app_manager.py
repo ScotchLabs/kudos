@@ -18,6 +18,6 @@ mail = Mail(app)
 
 basic_auth = BasicAuth(app)
 
-SSLify(app) # force https, might not work on localhost
+SSLify(app) # force https, only when debug is false, breaks on localhost
 
 ts = URLSafeTimedSerializer(app.config["SECRET_KEY"])
