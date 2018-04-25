@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField
+from wtforms import StringField, PasswordField, HiddenField
 from wtforms.validators import DataRequired, Email, Length, ValidationError
 from app_manager import db
 from models import User
@@ -61,3 +61,4 @@ class ChangePasswordForm(FlaskForm):
 
 class NominationForm(FlaskForm):
     entry = StringField('Nomination')
+    award_id = HiddenField('Award ID')

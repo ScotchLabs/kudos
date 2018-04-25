@@ -192,7 +192,7 @@ def awards():
             flash("Nominations must not exceed 128 characters", "error")
             form.entry.data = None
         else:
-            award = Award.query.filter_by(id=int(request.args.get('award'))).first_or_404()
+            award = Award.query.filter_by(id=form.award_id.data).first_or_404()
             award.nominations.append(Nomination(name=form.entry.data, creator=current_user))
             db.session.add(award)
             db.session.commit()

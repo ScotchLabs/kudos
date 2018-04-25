@@ -90,10 +90,11 @@
                                     <li style="font-size: 120%">{{ nom.name }}</li>
                                 {% endfor %}
                             </ul>
-                            <form method="POST" action="/awards?award={{ award.id }}">
+                            <form method="POST">
                                 <div class="row uniform 50%">
                                     <div class="9u 12u(mobilep)">
                                         {{ form.csrf_token }}
+                                        {{ form.award_id(value=award.id) }}
                                         {{ form.entry(placeholder=form.entry.label.text) }}
                                     </div>
                                     <div class="3u 12u(mobilep)">
