@@ -28,6 +28,15 @@
                 sound: false
             });
         </script>
+        <script>
+            var submitted = false;
+            function buttonClick(button) {
+                if (!submitted)
+                    submitted = true;
+                else
+                    button.disabled = true;
+            }
+        </script>
     </head>
     <body>
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -88,7 +97,7 @@
                                         {{ form.entry(placeholder=form.entry.label.text) }}
                                     </div>
                                     <div class="3u 12u(mobilep)">
-                                        <input type="submit" value="Submit" class="fit" />
+                                        <input type="submit" value="Submit" class="fit" onclick="buttonClick(this);" />
                                     </div>
                                 </div>
                                 {{ render_errors(form.entry) }}
