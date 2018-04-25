@@ -1,6 +1,7 @@
 from flask import redirect, render_template, url_for, send_file, abort, flash, request
 from flask_login import login_user, logout_user, current_user, login_required
 from flask_mail import Message
+from werkzeug.exceptions import default_exceptions
 from urllib.parse import urlparse, urljoin
 import itsdangerous
 import json
@@ -313,6 +314,12 @@ def set_phase():
 @app.route("/", methods=["GET"])
 def index():
     return render_template("index.html", phase=phase())
+
+def handle_error(e):
+    return render_template("error.html", error=e), e.code
+
+for code in default_exceptions:
+    app.register_error_handler(code, handle_error)
 
 def send_confirm_link(email):
     subject = "Confirm your email"
