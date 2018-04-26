@@ -245,6 +245,11 @@ def admin():
     return render_template("admin.html", bform=bform, uform=uform,
                            awards=Award.query.all(), phase=phase())
 
+@app.route("/admin/users", methods=["GET"])
+@basic_auth.required
+def list_users():
+    return "\n".join([u.username for u in User.query.all()])
+
 @app.route("/admin/ban", methods=["POST"])
 @basic_auth.required
 def ban():

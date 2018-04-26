@@ -10,7 +10,8 @@
     </style>
 </head>
 <div>
-    <a href="/">Home</a>
+    <a href="{{ url_for('index') }}">Home</a> <br>
+    <a href="{{ url_for('list_users') }}">Users</a>
 </div>
 <br/>
 {% with messages = get_flashed_messages(with_categories=true) %}
