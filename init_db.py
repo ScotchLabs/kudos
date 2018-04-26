@@ -40,7 +40,6 @@ def init_awards():
               Award(name="Best Prank"),
               Award(name="Most Likely to Injure Oneself"),
               Award(name="Kevin Perry Technical Insanity Award"),
-              Award(name="Alex DiClaudio Spackle Award"),
               Award(name="Donkeypunch Award"),
               Award(name="Coolest Rookie"),
               Award(name="Coolest Veteran"),

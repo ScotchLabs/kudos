@@ -316,7 +316,11 @@ def index():
     return render_template("index.html", phase=phase())
 
 def handle_error(e):
-    return render_template("error.html", error=e), e.code
+    try:
+        code = e.code
+    except AttributeError:
+        code = 500
+    return render_template("error.html", error=e), code
 
 for code in default_exceptions:
     app.register_error_handler(code, handle_error)
