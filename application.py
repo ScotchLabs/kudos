@@ -5,7 +5,7 @@ from werkzeug.exceptions import default_exceptions
 from urllib.parse import urlparse, urljoin
 import itsdangerous
 import json
-from app_manager import app, db, ts, mail, basic_auth
+from app_manager import app, db, ts, mail, basic_auth, award_order
 from forms import (SignupForm, LoginForm, UsernameForm, ResetPasswordForm,
                    ChangePasswordForm, NominationForm, BanForm, UnbanForm)
 from models import User, Award, Nomination, State
@@ -181,31 +181,34 @@ def change_password():
 @login_required
 def awards():
     if phase() == 0:
-        return render_template("nominees.html", awards=Award.query.all())
+        return render_template("nominees.html", awards=list_awards())
     if phase() == 2:
-        return render_template("voting.html", awards=Award.query.all())
+        return render_template("voting.html", awards=list_awards())
     # else: nominations
     form = NominationForm()
     if form.validate_on_submit():
+        award = Award.query.filter_by(id=form.award_id.data).first_or_404()
         if len(form.entry.data) < 1:
             flash("Cannot submit empty nominations", "error")
         elif len(form.entry.data) > 128:
             flash("Nominations must not exceed 128 characters", "error")
             form.entry.data = None
         else:
-            award = Award.query.filter_by(id=form.award_id.data).first_or_404()
             award.nominations.append(Nomination(name=form.entry.data, creator=current_user))
             db.session.add(award)
             db.session.commit()
             flash("Nomination successful!", "success")
-            return redirect(url_for("awards"))
-    return render_template('nominations.html', form=form, awards=Award.query.all())
+        return redirect(url_for("awards") + "#" + str(award.id))
+    return render_template('nominations.html', form=form, awards=list_awards())
 
 @app.route("/submit_vote", methods=["POST"])
 @login_required
 def submit_vote():
     result = { "success" : 0,
                "message" : "An error occurred" }
+    if phase != 2:
+        result["message"] = "Not voting phase!"
+        return json.dumps(result), 200
     nom_id = request.form["nom"]
     try:
         if nom_id is None:
@@ -242,13 +245,27 @@ def submit_vote():
 def admin():
     bform = BanForm()
     uform = UnbanForm()
+    full = request.args.get('full')
+    if full is None:
+        full = False
+    else:
+        full = True
     return render_template("admin.html", bform=bform, uform=uform,
-                           awards=Award.query.all(), phase=phase())
+                           awards=list_awards(), full=full, phase=phase())
 
 @app.route("/admin/users", methods=["GET"])
 @basic_auth.required
 def list_users():
-    return "\n".join([u.username for u in User.query.all()])
+    return "<br>".join([(u.username + " (%s)" %
+                        ("confirmed" if u.email_confirmed else "<b>not confirmed</b>"))
+                        for u in User.query.all()])
+
+@app.route("/admin/noms", methods=["GET"])
+@basic_auth.required
+def list_noms():
+    n = request.args.get('nom', type=int)
+    award = Award.query.filter_by(id=n).first_or_404()
+    return render_template("list_noms.html", award=award)
 
 @app.route("/admin/ban", methods=["POST"])
 @basic_auth.required
@@ -263,7 +280,7 @@ def ban():
         return redirect(url_for("admin"))
     uform = UnbanForm()
     return render_template("admin.html", bform=bform, uform=uform,
-                           awards=Award.query.all(), phase=phase())
+                           awards=list_awards(), phase=phase())
 
 @app.route("/admin/unban", methods=["POST"])
 @basic_auth.required
@@ -278,7 +295,7 @@ def unban():
         return redirect(url_for("admin"))
     bform = BanForm()
     return render_template("admin.html", bform=bform, uform=uform,
-                           awards=Award.query.all(), phase=phase())
+                           awards=list_awards(), phase=phase())
 
 @app.route("/admin/remove", methods=["GET"])
 @basic_auth.required
@@ -358,6 +375,11 @@ def is_safe_url(target):
 
 def phase():
     return State.query.first().phase
+
+def list_awards():
+    awards = Award.query.all()
+    awards.sort(key=lambda a: award_order.index(a.name))
+    return awards
 
 if __name__ == "__main__":
     app.run(debug=True) # should only be on debug when run locally, not on eb

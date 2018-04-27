@@ -15,49 +15,54 @@ def init_awards():
     db.session.query(Award).delete()
 
     awards = [
-              Award(name="Best Director"),
-              Award(name="Best Production Manager"),
-              Award(name="Best Stage Manager"),
-              Award(name="Best Technical Director"),
-              Award(name="Best Actress in a Lead Role"),
-              Award(name="Best Actor in a Lead Role"),
-              Award(name="Best Supporting Actress"),
-              Award(name="Best Supporting Actor"),
-              Award(name="Best Featured Performer"),
-              Award(name="Best Ensemble"),
-              Award(name="Best Duo"),
-              Award(name="Best Improv Performer"),
-              Award(name="Best Sketch Actor"),
-              Award(name="Best Cover"),
-              Award(name="Worst Cover"),
-              Award(name="Best Set Design"),
-              Award(name="Best Lighting"),
-              Award(name="Best Sound"),
-              Award(name="Best Costumes"),
-              Award(name="Best Props"),
-              Award(name="Best Original Work"),
-              Award(name="Best Strike/Load-in Moment"),
-              Award(name="Best Prank"),
-              Award(name="Most Likely to Injure Oneself"),
-              Award(name="Kevin Perry Technical Insanity Award"),
-              Award(name="Donkeypunch Award"),
-              Award(name="Coolest Rookie"),
-              Award(name="Coolest Veteran"),
-              Award(name="Party Animal"),
-              Award(name="Darren M. Canady Sassypants Award"),
-              Award(name="Cutest Couple"),
-              Award(name="Cutest Potential Couple"),
-              Award(name="Most Successful Flirt"),
-              Award(name="Least Successful Flirt"),
-              Award(name="Most Corrupted"),
-              Award(name="Shannon Deep S'n'S Mom Award"),
-              Award(name="The \"It Sounded Like A Good Idea at the Time\" Award"),
-              Award(name="King and Queen of the Black Chairs Award"),
-              Award(name="Best Late Show Moment"),
-              Award(name="Nathanial Biggs Coolest Uncle Award"),
-              Award(name="New Kudos Category"),
-              Award(name="Retire a Kudos Category")
-              ]
+        Award(name="Best Director"),
+        Award(name="Best Production Manager"),
+        Award(name="Best Stage Manager"),
+        Award(name="Best Technical Director"),
+        Award(name="Best Music Director"),
+        Award(name="Best Choreography"),
+        Award(name="Best Actress in a Lead Role"),
+        Award(name="Best Actor in a Lead Role"),
+        Award(name="Best Supporting Actress"),
+        Award(name="Best Supporting Actor"),
+        Award(name="Best Featured Performer"),
+        Award(name="Best Ensemble"),
+        Award(name="Best Duo"),
+        Award(name="Best Improv Performer"),
+        Award(name="Best Sketch Actor"),
+        Award(name="Best Cover"),
+        Award(name="Worst Cover"),
+        Award(name="Best Set Design"),
+        Award(name="Best Lighting"),
+        Award(name="Best Sound"),
+        Award(name="Best Costumes"),
+        Award(name="Best Props"),
+        Award(name="Best Publicity"),
+        Award(name="Best Hair & Makeup"),
+        Award(name="Best Original Work"),
+        Award(name="Best Strike/Load-in Moment"),
+        Award(name="Worst Strike/Load-in Moment"),
+        Award(name="Best Prank"),
+        Award(name="Most Likely to Injure Oneself"),
+        Award(name="Kevin Perry Technical Insanity Award"),
+        Award(name="Donkeypunch Award"),
+        Award(name="Coolest Rookie"),
+        Award(name="Coolest Veteran"),
+        Award(name="Party Animal"),
+        Award(name="Darren M. Canady Sassypants Award"),
+        Award(name="Cutest Couple"),
+        Award(name="Cutest Potential Couple"),
+        Award(name="Most Successful Flirt"),
+        Award(name="Least Successful Flirt"),
+        Award(name="Most Corrupted"),
+        Award(name="Shannon Deep S'n'S Mom Award"),
+        Award(name="The \"It Sounded Like A Good Idea at the Time\" Award"),
+        Award(name="King and Queen of the Black Chairs Award"),
+        Award(name="Best Late Show Moment"),
+        Award(name="Nathanial Biggs Coolest Uncle Award"),
+        Award(name="New Kudos Category"),
+        Award(name="Retire a Kudos Category")
+        ]
 
     for a in awards:
         db.session.add(a)
@@ -91,4 +96,10 @@ def init_some_noms():
 def init_state():
     state = State(phase=0)
     db.session.add(state)
+    db.session.commit()
+
+def clear_votes():
+    for user in User.query.all():
+        if len(user.selections) > 0:
+            user.selections = []
     db.session.commit()

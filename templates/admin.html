@@ -11,21 +11,26 @@
 </head>
 <div>
     <a href="{{ url_for('index') }}">Home</a> <br>
-    <a href="{{ url_for('list_users') }}">Users</a>
+    <a href="{{ url_for('list_users') }}" target="_blank">Users</a> <br>
+    {% if full %}
+        <a href="{{ url_for('admin') }}">Small Nom List</a>
+    {% else %}
+        <a href="{{ url_for('admin') }}?full">Full Nom List</a>
+    {% endif %}
 </div>
 <br/>
 {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    <ul class=flashes>
-    {% for category, message in messages %}
-      <li class="{{ category }}">
-      {% if category == "error" %}
-        <strong>Error:</strong>
-      {% endif %}
-      {{ message }}</li>
-    {% endfor %}
-    </ul>
-  {% endif %}
+    {% if messages %}
+        <ul class=flashes>
+        {% for category, message in messages %}
+            <li class="{{ category }}">
+            {% if category == "error" %}
+                <strong>Error:</strong>
+            {% endif %}
+            {{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
 {% endwith %}
 
 {% if phase != 0 %}
@@ -56,9 +61,13 @@
 
 <h1>Nominations</h1>
 {% for award in awards %}
-    <h2>{{ award.name }}</h2>
-    {% for nom in award.nominations %}
-        <b>{{ nom.votes }} votes</b> | {{ nom.name }} | {{ nom.creator.username }} | <a href="/admin/remove?nom={{ nom.id }}">Remove</a> | <a href="/admin/remove?nom={{ nom.id }}&warn={{ nom.creator.id }}">Remove and Warn</a> | <a href="/admin/remove?nom={{ nom.id }}&ban={{ nom.creator.id }}">Remove and Ban</a>
-        <br/>
-    {% endfor %}
+    {% if full %}
+        <h2>{{ award.name }}</h2>
+        {% for nom in award.nominations %}
+            <b>{{ nom.votes }} votes</b> | {{ nom.name }} | {{ nom.creator.username }} | <a href="{{ url_for('remove') }}?nom={{ nom.id }}">Remove</a> | <a href="{{ url_for('remove') }}?nom={{ nom.id }}&warn={{ nom.creator.id }}">Remove and Warn</a> | <a href="{{ url_for('remove') }}?nom={{ nom.id }}&ban={{ nom.creator.id }}">Remove and Ban</a>
+            <br/>
+        {% endfor %}
+    {% else %}
+        <h2><a href="{{ url_for('list_noms') }}?nom={{ award.id }}" target="_blank">{{ award.name }}</a></h2>
+    {% endif %}
 {% endfor %}

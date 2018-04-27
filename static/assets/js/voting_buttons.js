@@ -9,7 +9,7 @@ function submit_vote(click_id) {
                 $("a[name=nom" + vote_id + "]").css("background-color", "lightgreen");
             };
         } else {
-            $("#vote-error").text(data["message"]);
+            alert(data["message"]);
         }
     });
     return false;
