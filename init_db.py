@@ -103,3 +103,10 @@ def clear_votes():
         if len(user.selections) > 0:
             user.selections = []
     db.session.commit()
+
+def delete_award(award):
+    # delete all children nominations first
+    for nom in award.nominations:
+        db.session.delete(nom)
+    db.session.delete(award)
+    db.session.commit()

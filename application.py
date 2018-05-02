@@ -206,7 +206,7 @@ def awards():
 def submit_vote():
     result = { "success" : 0,
                "message" : "An error occurred" }
-    if phase != 2:
+    if phase() != 2:
         result["message"] = "Not voting phase!"
         return json.dumps(result), 200
     nom_id = request.form["nom"]
