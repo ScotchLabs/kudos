@@ -8,17 +8,19 @@ users = db.Table('users',
     db.Column('nom_id', db.Integer, db.ForeignKey('nomination.id'), primary_key=True)
 )
 
+def default_email(context):
+    # Andrew email should be used, but it could be different
+    return context.get_current_parameters()["username"] + "@andrew.cmu.edu"
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(16), unique=True, nullable=False)
     _password = db.Column(db.String(128), nullable=False)
+    email = db.Column(db.String(128), nullable=False, default=default_email,
+                      onupdate=default_email)
     email_confirmed = db.Column(db.Boolean, default=False, nullable=False)
     session_token = db.Column(db.String(128), nullable=False)
     banned = db.Column(db.Boolean, default=False, nullable=False)
-
-    @hybrid_property
-    def email(self):
-        return self.username + "@andrew.cmu.edu"
 
     @hybrid_property
     def password(self):
