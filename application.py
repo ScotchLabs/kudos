@@ -1,4 +1,5 @@
-from flask import redirect, render_template, url_for, send_file, abort, flash, request
+from flask import redirect, render_template, url_for, send_file, abort, \
+    flash, request
 from flask_login import login_user, logout_user, current_user, login_required
 from flask_mail import Message
 from werkzeug.exceptions import default_exceptions
@@ -19,7 +20,8 @@ def signup():
         return redirect(url_for('index'))
     form = SignupForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data.lower(), password=form.password.data)
+        user = User(username=form.username.data.lower(),
+                    password=form.password.data)
         db.session.add(user)
         db.session.commit()
 
@@ -67,7 +69,8 @@ def new_link(token):
 def resend():
     form = UsernameForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data.lower()).first_or_404()
+        user = User.query.filter_by(
+            username=form.username.data.lower()).first_or_404()
         if user.email_confirmed == True:
             flash("Your email is already confirmed!", "error")
             return render_template('resend.html', form=form)
@@ -82,7 +85,8 @@ def signin():
         return redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data.lower()).first_or_404()
+        user = User.query.filter_by(
+            username=form.username.data.lower()).first_or_404()
         if not user.email_confirmed:
             flash("Please click the confirmation link sent to your email first",
                   "error")
@@ -113,7 +117,8 @@ def signout():
 def reset():
     form = UsernameForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data.lower()).first_or_404()
+        user = User.query.filter_by(
+            username=form.username.data.lower()).first_or_404()
 
         subject = "Password reset requested"
 
@@ -194,7 +199,8 @@ def awards():
             flash("Nominations must not exceed 128 characters", "error")
             form.entry.data = None
         else:
-            award.nominations.append(Nomination(name=form.entry.data, creator=current_user))
+            award.nominations.append(Nomination(name=form.entry.data,
+                                                creator=current_user))
             db.session.add(award)
             db.session.commit()
             flash("Nomination successful!", "success")
@@ -256,9 +262,10 @@ def admin():
 @app.route("/admin/users", methods=["GET"])
 @basic_auth.required
 def list_users():
-    return "<br>".join([(u.username + " (%s)" %
-                        ("confirmed" if u.email_confirmed else "<b>not confirmed</b>"))
-                        for u in User.query.all()])
+    return "<br>".join(
+        [(u.username + " (%s)" %
+            ("confirmed" if u.email_confirmed else "<b>not confirmed</b>"))
+        for u in User.query.all()])
 
 @app.route("/admin/noms", methods=["GET"])
 @basic_auth.required
@@ -272,7 +279,8 @@ def list_noms():
 def ban():
     bform = BanForm()
     if bform.validate_on_submit():
-        user = User.query.filter_by(username=bform.username.data.lower()).first_or_404()
+        user = User.query.filter_by(
+            username=bform.username.data.lower()).first_or_404()
         user.ban()
         db.session.add(user)
         db.session.commit()
@@ -287,7 +295,8 @@ def ban():
 def unban():
     uform = UnbanForm()
     if uform.validate_on_submit():
-        user = User.query.filter_by(username=uform.username.data.lower()).first_or_404()
+        user = User.query.filter_by(
+            username=uform.username.data.lower()).first_or_404()
         user.unban()
         db.session.add(user)
         db.session.commit()
@@ -330,7 +339,8 @@ def set_phase():
             abort(404)
         db.session.query(State).first().phase = p
         db.session.commit()
-        flash("Phase changed to %s" % ("static", "nominating", "voting")[p], "success")
+        flash("Phase changed to %s" %
+            ("static", "nominating", "voting")[p], "success")
     return redirect(url_for("admin"))
 
 @app.route("/", methods=["GET"])
