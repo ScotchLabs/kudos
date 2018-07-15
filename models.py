@@ -82,6 +82,7 @@ class Award(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
     nominations = db.relationship("Nomination", backref="award")
+    order = db.Column(db.Integer, nullable=False, default=1000)
 
     def __repr__(self):
         return '<Award %r>' % self.name

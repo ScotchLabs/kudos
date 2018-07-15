@@ -8,7 +8,7 @@ from werkzeug.exceptions import default_exceptions
 from urllib.parse import urlparse, urljoin
 import itsdangerous
 import json
-from app_manager import app, db, ts, mail, award_order
+from app_manager import app, db, ts, mail
 from forms import (SignupForm, LoginForm, UsernameForm, ResetPasswordForm,
                    ChangePasswordForm, NominationForm, BanForm, AdminForm)
 from models import User, Award, Nomination, State
@@ -447,9 +447,7 @@ def phase():
     return State.query.first().phase
 
 def list_awards():
-    awards = Award.query.all()
-    awards.sort(key=lambda a: award_order.index(a.name))
-    return awards
+    return Award.query.order_by(Award.order).all()
 
 if __name__ == "__main__":
     app.run(debug=True) # should only be on debug when run locally, not on eb
