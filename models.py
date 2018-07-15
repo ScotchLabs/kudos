@@ -13,6 +13,7 @@ users = db.Table('users',
 def default_email(context):
     # Andrew email should be used, but it could be different
     if context is None:
+        # flask_admin's create interface will pass None for context
         return "email@domain.com"
     return context.get_current_parameters()["username"] + "@andrew.cmu.edu"
 

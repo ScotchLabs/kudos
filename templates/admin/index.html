@@ -5,56 +5,29 @@
 
 <div>
     <a href="{{ url_for('index') }}" class="btn btn-primary">Back to Kudos Home</a> <br><br>
-    <a href="{{ url_for('admin.list_users') }}" class="btn btn-default">Users</a> <br>
-    {% if full %}
-        <a href="{{ url_for('admin.index') }}" class="btn btn-default">Small Nom List</a>
-    {% else %}
-        <a href="{{ url_for('admin.index') }}?full" class="btn btn-default">Full Nom List</a>
-    {% endif %}
+
+    <a href="{{ url_for('admin.list_users') }}" class="btn btn-default">Users</a> <br><br>
+
+    <a href="{{ url_for('admin.index') }}" class="btn btn-default {{ 'disabled' if not full }}">Short Nom List</a>
+    <a href="{{ url_for('admin.index') }}?full" class="btn btn-default {{ 'disabled' if full }}">Full Nom List</a>
 </div>
 
 <br/>
 
-{% if phase != 0 %}
-    {% if full %}
-        <a href="/admin/setphase?full&phase=0" class="btn btn-default">Switch to static phase</a>
-    {% else %}
-        <a href="/admin/setphase?phase=0" class="btn btn-default">Switch to static phase</a>
-    {% endif %}
-{% endif %}
-{% if phase != 1 %}
-    {% if full %}
-        <a href="/admin/setphase?full&phase=1" class="btn btn-default">Switch to nominating phase</a>
-    {% else %}
-        <a href="/admin/setphase?phase=1" class="btn btn-default">Switch to nominating phase</a>
-    {% endif %}
-{% endif %}
-{% if phase != 2 %}
-    {% if full %}
-        <a href="/admin/setphase?full&phase=2" class="btn btn-default">Switch to voting phase</a>
-    {% else %}
-        <a href="/admin/setphase?phase=2" class="btn btn-default">Switch to voting phase</a>
-    {% endif %}
-{% endif %}
+<a href="/admin/setphase?{{ 'full&' if full }}phase=0" class="btn btn-default {{ 'disabled' if phase == 0 }}">Switch to static phase</a>
+<a href="/admin/setphase?{{ 'full&' if full }}phase=1" class="btn btn-default {{ 'disabled' if phase == 1 }}">Switch to nominating phase</a>
+<a href="/admin/setphase?{{ 'full&' if full }}phase=2" class="btn btn-default {{ 'disabled' if phase == 2 }}">Switch to voting phase</a>
 
 <br><br>
 
-{% if full %}
-    <form method="POST" action="/admin/ban?full">
-{% else %}
-    <form method="POST" action="/admin/ban">
-{% endif %}
+<form method="POST" action="/admin/ban{{ '?full' if full }}">
     {{ bform.csrf_token }}
     {{ bform.banuser() }}
     {{ bform.ban }} {{ bform.unban }}
     {{ render_errors(bform.banuser) }}
 </form>
 
-{% if full %}
-    <form method="POST" action="/admin/admin?full">
-{% else %}
-    <form method="POST" action="/admin/admin">
-{% endif %}
+<form method="POST" action="/admin/admin{{ '?full' if full }}">
     {{ aform.csrf_token }}
     {{ aform.adminuser() }}
     {{ aform.give }} {{ aform.take }}
