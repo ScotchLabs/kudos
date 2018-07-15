@@ -1,5 +1,5 @@
 # Kudos
-Application to run the Kudos Awards for Scotch'n'Soda Theatre at Carnegie Mellon University
+Application to run the Kudos Awards for Scotch'n'Soda Theatre at Carnegie Mellon University.
 
 # Flask Config
 Specify the following attributes in top-level `config.py`:
@@ -48,13 +48,6 @@ option_settings:
     SSLCertificateId: arn:aws:acm:us-east-2:1234567890123:certificate/####################################
     ListenerProtocol: HTTPS
     InstancePort: 80
-```
-
-`.ebextensions/auth.config` (send flask basic auth credentials as plain text)
-```
-container_commands:
-  01_wsgi_pass_headers:
-    command: 'echo "WSGIPassAuthorization On" >> ../wsgi.conf'
 ```
 
 If using the EB CLI, you will also need to at least create an empty `.ebignore` file, otherwise `.gitignore` will be used by default, which will ignore your `config.py` file. You may of course also add to this file whatever else you want to ignore.
