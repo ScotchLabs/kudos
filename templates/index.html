@@ -1,125 +1,40 @@
-<!DOCTYPE HTML>
-<!--
-    Alpha by HTML5 UP
-    html5up.net | @ajlkn
-    Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
-<html>
-    <head>
-        <title>Kudos | Scotch'n'Soda</title>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <!--[if lte IE 8]><script src="/static/assets/js/ie/html5shiv.js"></script><![endif]-->
-        <link rel="stylesheet" href="/static/assets/css/main.css" />
-        <!--[if lte IE 8]><link rel="stylesheet" href="/static/assets/css/ie8.css" /><![endif]-->
-        <link rel="icon" href="/static/images/oscar.png"/>
+{% extends 'layout.html' %}
 
-        <link rel="stylesheet" href="/static/assets/font-awesome/css/font-awesome.min.css"/>
-        <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
-        <link rel="stylesheet" href="/static/assets/dist/css/lobibox.min.css">
-        <script src="/static/assets/dist/js/lobibox.min.js"></script>
-        <script>
-            Lobibox.notify.DEFAULTS = $.extend({}, Lobibox.notify.DEFAULTS, {
-                iconSource: 'fontAwesome'
-            });
-            Lobibox.notify.DEFAULTS = $.extend({}, Lobibox.notify.DEFAULTS, {
-                sound: false
-            });
-        </script>
-    </head>
+{% block title %}Kudos | Scotch'n'Soda{% endblock %}
 
-    <body class="landing">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <script>
-                        Lobibox.notify("{{ category }}", {
-                            msg: "{{ message }}"
-                        });
-                    </script>
-                {% endfor %}
+{% block header_tag %}<header id="header" class="alt">{% endblock %}
+{% block body_tag %}<body class="landing">{% endblock %}
+
+{% block body %}
+<!-- Banner -->
+    <section id="banner">
+        <h2>Kudos Awards!</h2>
+        <p>Celebrating the best of the 2017-18 Season in Scotch'n'Soda Theatre</p>
+        <ul class="actions">
+            {% if current_user.is_authenticated %}
+                {% if phase == 0 %}
+                    <li><a href="{{ url_for('awards') }}" class="button special">View Nominees</a></li>
+                {% elif phase == 1 %}
+                    <li><a href="{{ url_for('awards') }}" class="button special">Nominations!</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('awards') }}" class="button special">Time to vote!</a></li>
+                {% endif %}
+            {% else %}
+                <li><a href="{{ url_for('signup') }}" class="button special">Create an Account</a></li>
+                <li><a href="{{ url_for('signin') }}" class="button">Sign In</a></li>
             {% endif %}
-        {% endwith %}
-        <div id="page-wrapper">
+        </ul>
+    </section>
 
-            <!-- Header -->
-                <header id="header" class="alt">
-                    <h1><a href="{{ url_for('index') }}">Kudos</a> by Scotch'n'Soda Theatre</h1>
-                    <nav id="nav">
-                        <ul>
-                            <li><a href="{{ url_for('index') }}">Home</a></li>
-                            {% if current_user.is_authenticated %}
-                                <li><a href="{{ url_for('awards') }}">Awards</a></li>
-                                <li>
-                                    <a class="icon fa-angle-down">{{ current_user.username }}</a>
-                                    <ul>
-                                        <li><a href="{{ url_for('change_password') }}">Change Password</a></li>
-                                        <li><a href="{{ url_for('signout') }}">Sign Out</a></li>
-                                    </ul>
-                                </li>
-                            {% else %}
-                                <li><a href="{{ url_for('signin') }}">Sign In</a></li>
-                                <li><a href="{{ url_for('signup') }}" class="button">Sign Up</a></li>
-                            {% endif %}
-                        </ul>
-                    </nav>
-                </header>
+<!-- Main -->
+    <section id="main" class="container">
 
-            <!-- Banner -->
-                <section id="banner">
-                    <h2>Kudos Awards!</h2>
-                    <p>Celebrating the best of the 2017-18 Season in Scotch'n'Soda Theatre</p>
-                    <ul class="actions">
-                        {% if current_user.is_authenticated %}
-                            {% if phase == 0 %}
-                                <li><a href="{{ url_for('awards') }}" class="button special">View Nominees</a></li>
-                            {% elif phase == 1 %}
-                                <li><a href="{{ url_for('awards') }}" class="button special">Nominations!</a></li>
-                            {% else %}
-                                <li><a href="{{ url_for('awards') }}" class="button special">Time to vote!</a></li>
-                            {% endif %}
-                        {% else %}
-                            <li><a href="{{ url_for('signup') }}" class="button special">Create an Account</a></li>
-                            <li><a href="{{ url_for('signin') }}" class="button">Sign In</a></li>
-                        {% endif %}
-                    </ul>
-                </section>
+        <section class="box special">
+            <header class="major">
+                <h2><b>What are Kudos Awards?</b></h2>
+                <p>At the end of every year, we celebrate everything we loved about the past season in S'n'S, from the most talented performers to the rulers of the Black Chairs, to be awarded at the semester's Woodscotch. First is a round of nominations, followed by voting. Make an account and sign in to get started!</p>
+            </header>
+        </section>
 
-            <!-- Main -->
-                <section id="main" class="container">
-
-                    <section class="box special">
-                        <header class="major">
-                            <h2><b>What are Kudos Awards?</b></h2>
-                            <p>At the end of every year, we celebrate everything we loved about the past season in S'n'S, from the most talented performers to the rulers of the Black Chairs, to be awarded at the semester's Woodscotch. First is a round of nominations, followed by voting. Make an account and sign in to get started!</p>
-                        </header>
-                    </section>
-
-                </section>
-
-            <!-- Footer -->
-                <footer id="footer">
-                    <ul class="icons">
-                        <li><a href="https://www.facebook.com/snstheatre/" class="icon fa-facebook" target="_blank"><span class="label">Facebook</span></a></li>
-                        <li><a href="https://www.instagram.com/scotchnsodatheatre" class="icon fa-instagram" target="_blank"><span class="label">Instagram</span></a></li>
-                        <li><a href="https://www.twitter.com/snstheatre" class="icon fa-twitter" target="_blank"><span class="label">Twitter</span></a></li>
-                        <li><a href="https://github.com/gseastream/kudos" class="icon fa-github" target="_blank"><span class="label">Github</span></a></li>
-                    </ul>
-                    <ul class="copyright">
-                        <li>&copy; Scotch'n'Soda Theatre</li><li>Website: Grant Seastream</li><li>Design: <a href="http://html5up.net" target="_blank">HTML5 UP</a></li>
-                    </ul>
-                </footer>
-
-        </div>
-
-        <!-- Scripts -->
-            <script src="/static/assets/js/jquery.min.js"></script>
-            <script src="/static/assets/js/jquery.dropotron.min.js"></script>
-            <script src="/static/assets/js/jquery.scrollgress.min.js"></script>
-            <script src="/static/assets/js/skel.min.js"></script>
-            <script src="/static/assets/js/util.js"></script>
-            <!--[if lte IE 8]><script src="/static/assets/js/ie/respond.min.js"></script><![endif]-->
-            <script src="/static/assets/js/main.js"></script>
-
-    </body>
-</html>
+    </section>
+{% endblock body %}

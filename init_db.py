@@ -1,5 +1,6 @@
 from app_manager import db
 from models import User, Award, Nomination, State
+import os
 
 def init_db():
     db.drop_all()
@@ -59,7 +60,7 @@ def init_awards():
         Award(name="The \"It Sounded Like A Good Idea at the Time\" Award"),
         Award(name="King and Queen of the Black Chairs Award"),
         Award(name="Best Late Show Moment"),
-        Award(name="Nathanial Biggs Coolest Uncle Award"),
+        Award(name="Nathaniel Biggs Coolest Uncle Award"),
         Award(name="New Kudos Category"),
         Award(name="Retire a Kudos Category")
         ]
@@ -73,7 +74,8 @@ def init_some_noms():
     """Not destructive, will add these to the first 5 awards"""
     user = User.query.filter_by(username="gseastre").first()
     if user is None:
-        user = User(username="gseastre", password="iamgroont", email_confirmed=True)
+        user = User(username="gseastre", password="iamgroont",
+            email_confirmed=True, is_admin=True)
         db.session.add(user)
 
     awards = db.session.query(Award).all()
@@ -110,3 +112,6 @@ def delete_award(award):
         db.session.delete(nom)
     db.session.delete(award)
     db.session.commit()
+
+def remove_local_db():
+    os.remove("data.db")

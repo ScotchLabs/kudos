@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, HiddenField
+from wtforms import StringField, PasswordField, HiddenField, SubmitField
 from wtforms.validators import DataRequired, Email, Length, ValidationError
 from app_manager import db
 from models import User
@@ -17,17 +17,21 @@ def exists(form, field):
     if user is None:
         raise ValidationError("Username does not exist")
 
-def is_banned(form, field):
+def check_ban(form, field):
     exists(form, field)
     user = User.query.filter_by(username=field.data.lower()).first()
-    if not user.banned:
+    if form.ban.data and user.banned:
+        raise ValidationError("User is already banned")
+    elif form.unban.data and not user.banned:
         raise ValidationError("User is not banned")
 
-def is_not_banned(form, field):
+def check_admin(form, field):
     exists(form, field)
     user = User.query.filter_by(username=field.data.lower()).first()
-    if user.banned:
-        raise ValidationError("User is already banned")
+    if form.give.data and user.is_admin:
+        raise ValidationError("User is already admin")
+    elif form.take.data and not user.is_admin:
+        raise ValidationError("User is not admin")
 
 class SignupForm(FlaskForm):
     username = StringField('Andrew ID',
@@ -43,12 +47,15 @@ class UsernameForm(FlaskForm):
     username = StringField('Andrew ID', validators=[DataRequired(), exists])
 
 class BanForm(FlaskForm):
-    username = StringField('Andrew ID',
-        validators=[DataRequired(), is_not_banned])
+    banuser = StringField('Username', validators=[DataRequired(), check_ban])
+    ban = SubmitField('Ban User')
+    unban = SubmitField('Unban User')
 
-class UnbanForm(FlaskForm):
-    username = StringField('Andrew ID',
-        validators=[DataRequired(), is_banned])
+class AdminForm(FlaskForm):
+    adminuser = StringField('Username',
+        validators=[DataRequired(), check_admin])
+    give = SubmitField('Give Admin')
+    take = SubmitField('Take Admin')
 
 class ResetPasswordForm(FlaskForm):
     password = PasswordField('New Password',

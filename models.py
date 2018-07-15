@@ -12,17 +12,27 @@ users = db.Table('users',
 
 def default_email(context):
     # Andrew email should be used, but it could be different
+    if context is None:
+        return "email@domain.com"
     return context.get_current_parameters()["username"] + "@andrew.cmu.edu"
+
+def default_password():
+    return bcrypt.generate_password_hash("password")
+
+def default_token():
+    return bcrypt.generate_password_hash(str(time.time()))
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(16), unique=True, nullable=False)
-    _password = db.Column(db.String(128), nullable=False)
-    email = db.Column(db.String(128), nullable=False, default=default_email,
-                      onupdate=default_email)
+    _password = db.Column(db.String(128), nullable=False,
+                          default=default_password)
+    email = db.Column(db.String(128), nullable=False, default=default_email)
     email_confirmed = db.Column(db.Boolean, default=False, nullable=False)
-    session_token = db.Column(db.String(128), nullable=False)
+    session_token = db.Column(db.String(128), nullable=False,
+                              default=default_token)
     banned = db.Column(db.Boolean, default=False, nullable=False)
+    is_admin = db.Column(db.Boolean, default=False, nullable=False)
 
     @hybrid_property
     def password(self):
@@ -31,20 +41,26 @@ class User(db.Model, UserMixin):
     @password.setter
     def password(self, plaintext):
         self._password = bcrypt.generate_password_hash(plaintext)
-        self._set_token() # reset the token when you change the password
+        self.reset_token() # reset the token when you change the password
 
     def is_correct_password(self, plaintext):
         return bcrypt.check_password_hash(self._password, plaintext)
 
-    def _set_token(self):
+    def reset_token(self):
         self.session_token = bcrypt.generate_password_hash(str(time.time()))
 
     def ban(self):
         self.banned = True
-        self._set_token() # invalidate their sessions
+        self.reset_token() # invalidate their sessions
 
     def unban(self):
         self.banned = False
+
+    def give_admin(self):
+        self.is_admin = True
+
+    def take_admin(self):
+        self.is_admin = False
 
     # Flask-Login properties
     @property
@@ -59,7 +75,7 @@ class User(db.Model, UserMixin):
         return self.session_token
 
     def __repr__(self):
-        return '<User %r>' % self.id
+        return '<User %r>' % self.username
 
 class Award(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -67,12 +83,12 @@ class Award(db.Model):
     nominations = db.relationship("Nomination", backref="award")
 
     def __repr__(self):
-        return '<Award %r>' % self.id
+        return '<Award %r>' % self.name
 
 class Nomination(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
-    award_id = db.Column(db.Integer, db.ForeignKey('award.id'))
+    award_id = db.Column(db.Integer, db.ForeignKey('award.id'), nullable=False)
     creator = db.relationship("User", backref="entries")
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     voters = db.relationship("User", secondary=users,

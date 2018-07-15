@@ -2,15 +2,17 @@ from flask import redirect, render_template, url_for, send_file, abort, \
     flash, request
 from flask_login import login_user, logout_user, current_user, login_required
 from flask_mail import Message
+from flask_admin import Admin, AdminIndexView, expose
+from flask_admin.contrib.sqla import ModelView
 from werkzeug.exceptions import default_exceptions
 from urllib.parse import urlparse, urljoin
 import itsdangerous
 import json
 from app_manager import app, db, ts, mail, basic_auth, award_order
 from forms import (SignupForm, LoginForm, UsernameForm, ResetPasswordForm,
-                   ChangePasswordForm, NominationForm, BanForm, UnbanForm)
+                   ChangePasswordForm, NominationForm, BanForm, AdminForm)
 from models import User, Award, Nomination, State
-import login_manager # just to run initialization
+from login_manager import login_manager
 
 application = app # name needed for eb
 
@@ -185,9 +187,10 @@ def change_password():
 @app.route("/awards", methods=["GET", "POST"])
 @login_required
 def awards():
-    if phase() == 0:
+    p = phase()
+    if p == 0:
         return render_template("nominees.html", awards=list_awards())
-    if phase() == 2:
+    if p == 2:
         return render_template("voting.html", awards=list_awards())
     # else: nominations
     form = NominationForm()
@@ -246,106 +249,163 @@ def submit_vote():
     db.session.commit()
     return json.dumps(result), 200
 
-@app.route("/admin", methods=["GET"])
-@basic_auth.required
-def admin():
-    bform = BanForm()
-    uform = UnbanForm()
-    full = request.args.get('full')
-    if full is None:
-        full = False
-    else:
-        full = True
-    return render_template("admin.html", bform=bform, uform=uform,
-                           awards=list_awards(), full=full, phase=phase())
-
-@app.route("/admin/users", methods=["GET"])
-@basic_auth.required
-def list_users():
-    return "<br>".join(
-        [(u.username + " (%s)" %
-            ("confirmed" if u.email_confirmed else "<b>not confirmed</b>"))
-        for u in User.query.all()])
-
-@app.route("/admin/noms", methods=["GET"])
-@basic_auth.required
-def list_noms():
-    n = request.args.get('nom', type=int)
-    award = Award.query.filter_by(id=n).first_or_404()
-    return render_template("list_noms.html", award=award)
-
-@app.route("/admin/ban", methods=["POST"])
-@basic_auth.required
-def ban():
-    bform = BanForm()
-    if bform.validate_on_submit():
-        user = User.query.filter_by(
-            username=bform.username.data.lower()).first_or_404()
-        user.ban()
-        db.session.add(user)
-        db.session.commit()
-        flash("Banned %s" % user.username, "success")
-        return redirect(url_for("admin"))
-    uform = UnbanForm()
-    return render_template("admin.html", bform=bform, uform=uform,
-                           awards=list_awards(), phase=phase())
-
-@app.route("/admin/unban", methods=["POST"])
-@basic_auth.required
-def unban():
-    uform = UnbanForm()
-    if uform.validate_on_submit():
-        user = User.query.filter_by(
-            username=uform.username.data.lower()).first_or_404()
-        user.unban()
-        db.session.add(user)
-        db.session.commit()
-        flash("Unbanned %s" % user.username, "success")
-        return redirect(url_for("admin"))
-    bform = BanForm()
-    return render_template("admin.html", bform=bform, uform=uform,
-                           awards=list_awards(), phase=phase())
-
-@app.route("/admin/remove", methods=["GET"])
-@basic_auth.required
-def remove():
-    n = request.args.get('nom', type=int)
-    w = request.args.get('warn', type=int)
-    b = request.args.get('ban', type=int)
-    if n is not None:
-        nom = Nomination.query.filter_by(id=n).first_or_404()
-        db.session.delete(nom)
-        db.session.commit()
-    if w is not None:
-        user = User.query.filter_by(id=w).first_or_404()
-        subject = "Inappropriate Content Warning"
-        html = render_template('email/warning.html')
-        send_email(user.email, subject, html)
-        flash("Warning sent to %s" % user.username, "success")
-    if b is not None:
-        user = User.query.filter_by(id=b).first_or_404()
-        user.ban()
-        db.session.add(user)
-        db.session.commit()
-        flash("Banned %s" % user.username, "success")
-    return redirect(url_for("admin"))
-
-@app.route("/admin/setphase", methods=["GET"])
-@basic_auth.required
-def set_phase():
-    p = request.args.get('phase', type=int)
-    if p is not None:
-        if not p in (0,1,2):
-            abort(404)
-        db.session.query(State).first().phase = p
-        db.session.commit()
-        flash("Phase changed to %s" %
-            ("static", "nominating", "voting")[p], "success")
-    return redirect(url_for("admin"))
-
 @app.route("/", methods=["GET"])
 def index():
     return render_template("index.html", phase=phase())
+
+# Admin Interface
+
+class MyAdminIndexView(AdminIndexView):
+    def is_accessible(self):
+        if not current_user.is_active or not current_user.is_authenticated:
+            return False
+        return current_user.is_admin
+
+    def _handle_view(self, name, **kwds):
+        if not self.is_accessible():
+            if current_user.is_authenticated:
+                abort(403)
+            else:
+                return login_manager.unauthorized()
+
+    @expose("/", methods=["GET"])
+    def index(self):
+        bform = BanForm()
+        aform = AdminForm()
+        full = self.get_full()
+        return self.render("admin/index.html", bform=bform, aform=aform,
+                           awards=list_awards(), full=full, phase=phase())
+
+    @expose("/user_list", methods=["GET"])
+    def list_users(self):
+        return self.render("admin/list_users.html", users=User.query.all())
+
+    @expose("/noms", methods=["GET"])
+    def list_noms(self):
+        n = request.args.get('nom', type=int)
+        award = Award.query.filter_by(id=n).first_or_404()
+        return self.render("admin/list_noms.html", award=award)
+
+    @expose("/ban", methods=["POST"])
+    def ban(self):
+        full = self.get_full()
+        bform = BanForm()
+        if bform.validate_on_submit():
+            user = User.query.filter_by(
+                username=bform.banuser.data.lower()).first_or_404()
+            msg = None
+            if bform.ban.data:
+                user.ban()
+                msg = ("Banned %s" % user.username, "success")
+            elif bform.unban.data:
+                user.unban()
+                msg = ("Unbanned %s" % user.username, "success")
+            db.session.add(user)
+            db.session.commit()
+            if msg is not None:
+                flash(*msg) # don't flash until commit passes
+            if full:
+                return redirect("/admin/?full")
+            else:
+                return redirect("/admin/")
+        aform = AdminForm()
+        return self.render("admin/index.html", bform=bform, aform=aform,
+                           awards=list_awards(), full=full, phase=phase())
+
+    @expose("/admin", methods=["POST"])
+    def change_admin(self):
+        full = self.get_full()
+        aform = AdminForm()
+        if aform.validate_on_submit():
+            user = User.query.filter_by(
+                username=aform.adminuser.data.lower()).first_or_404()
+            msg = None
+            if aform.give.data:
+                user.give_admin()
+                msg = ("Made %s an admin" % user.username, "success")
+            elif aform.take.data:
+                user.take_admin()
+                msg = ("Removed %s as admin" % user.username, "success")
+            db.session.add(user)
+            db.session.commit()
+            if msg is not None:
+                flash(*msg) # don't flash until commit passes
+            if full:
+                return redirect("/admin/?full")
+            else:
+                return redirect("/admin/")
+        bform = BanForm()
+        return self.render("admin/index.html", bform=bform, aform=aform,
+                           awards=list_awards(), full=full, phase=phase())
+
+    @expose("/remove", methods=["GET"])
+    def remove(self):
+        n = request.args.get('nom', type=int)
+        w = request.args.get('warn', type=int)
+        b = request.args.get('ban', type=int)
+        if n is not None:
+            nom = Nomination.query.filter_by(id=n).first_or_404()
+            db.session.delete(nom)
+            db.session.commit()
+            flash("Removed %r" % nom, "success")
+        if w is not None:
+            user = User.query.filter_by(id=w).first_or_404()
+            subject = "Inappropriate Content Warning"
+            html = render_template('email/warning.html')
+            send_email(user.email, subject, html)
+            flash("Warning sent to %s" % user.username, "success")
+        if b is not None:
+            user = User.query.filter_by(id=b).first_or_404()
+            user.ban()
+            db.session.add(user)
+            db.session.commit()
+            subject = "Your account has been banned"
+            html = render_template('email/ban.html')
+            send_email(user.email, subject, html)
+            flash("Banned and notified %s" % user.username, "success")
+        full = self.get_full()
+        if full:
+            return redirect("/admin/?full")
+        else:
+            return redirect("/admin/")
+
+    @expose("/setphase", methods=["GET"])
+    def set_phase(self):
+        p = request.args.get('phase', type=int)
+        if p is not None:
+            if not p in (0,1,2):
+                abort(404)
+            db.session.query(State).first().phase = p
+            db.session.commit()
+            flash("Phase changed to %s" %
+                ("static", "nominating", "voting")[p], "success")
+        full = self.get_full()
+        if full:
+            return redirect("/admin/?full")
+        else:
+            return redirect("/admin/")
+
+    def get_full(self):
+        full = request.args.get('full')
+        if full is None:
+            return False
+        else:
+            # if full appears as anything in request, render the full page
+            return True
+
+class MyModelView(ModelView):
+    is_accessible = MyAdminIndexView.is_accessible
+    _handle_view = MyAdminIndexView._handle_view
+
+class UserView(MyModelView):
+    column_exclude_list = ['_password', "session_token"]
+
+admin = Admin(app, name='Kudos Admin', template_mode='bootstrap3',
+    index_view=MyAdminIndexView())
+admin.add_view(UserView(User, db.session))
+admin.add_view(MyModelView(Award, db.session))
+admin.add_view(MyModelView(Nomination, db.session))
+admin.add_view(MyModelView(State, db.session))
 
 def handle_error(e):
     try:

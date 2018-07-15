@@ -1,0 +1,77 @@
+{% extends 'admin/master.html' %}
+{% from "formhelpers.html" import render_errors %}
+
+{% block body %}
+
+<div>
+    <a href="{{ url_for('index') }}" class="btn btn-primary">Back to Kudos Home</a> <br><br>
+    <a href="{{ url_for('admin.list_users') }}" class="btn btn-default">Users</a> <br>
+    {% if full %}
+        <a href="{{ url_for('admin.index') }}" class="btn btn-default">Small Nom List</a>
+    {% else %}
+        <a href="{{ url_for('admin.index') }}?full" class="btn btn-default">Full Nom List</a>
+    {% endif %}
+</div>
+
+<br/>
+
+{% if phase != 0 %}
+    {% if full %}
+        <a href="/admin/setphase?full&phase=0" class="btn btn-default">Switch to static phase</a>
+    {% else %}
+        <a href="/admin/setphase?phase=0" class="btn btn-default">Switch to static phase</a>
+    {% endif %}
+{% endif %}
+{% if phase != 1 %}
+    {% if full %}
+        <a href="/admin/setphase?full&phase=1" class="btn btn-default">Switch to nominating phase</a>
+    {% else %}
+        <a href="/admin/setphase?phase=1" class="btn btn-default">Switch to nominating phase</a>
+    {% endif %}
+{% endif %}
+{% if phase != 2 %}
+    {% if full %}
+        <a href="/admin/setphase?full&phase=2" class="btn btn-default">Switch to voting phase</a>
+    {% else %}
+        <a href="/admin/setphase?phase=2" class="btn btn-default">Switch to voting phase</a>
+    {% endif %}
+{% endif %}
+
+<br><br>
+
+{% if full %}
+    <form method="POST" action="/admin/ban?full">
+{% else %}
+    <form method="POST" action="/admin/ban">
+{% endif %}
+    {{ bform.csrf_token }}
+    {{ bform.banuser() }}
+    {{ bform.ban }} {{ bform.unban }}
+    {{ render_errors(bform.banuser) }}
+</form>
+
+{% if full %}
+    <form method="POST" action="/admin/admin?full">
+{% else %}
+    <form method="POST" action="/admin/admin">
+{% endif %}
+    {{ aform.csrf_token }}
+    {{ aform.adminuser() }}
+    {{ aform.give }} {{ aform.take }}
+    {{ render_errors(aform.adminuser) }}
+</form>
+
+<h1>Nominations</h1>
+{% for award in awards %}
+    {% if full %}
+        <h2>{{ award.name }}</h2>
+        {% for nom in award.nominations %}
+            <b>{{ nom.votes }} votes</b> | {{ nom.name }} | {{ nom.creator.username }} | <a href="{{ url_for('admin.remove') }}?full&nom={{ nom.id }}">Remove</a> | <a href="{{ url_for('admin.remove') }}?full&nom={{ nom.id }}&warn={{ nom.creator.id }}">Remove and Warn</a> | <a href="{{ url_for('admin.remove') }}?full&nom={{ nom.id }}&ban={{ nom.creator.id }}">Remove, Ban, Notify</a>
+            <br/>
+        {% endfor %}
+    {% else %}
+        <h2><a href="{{ url_for('admin.list_noms') }}?nom={{ award.id }}">{{ award.name }}</a></h2>
+    {% endif %}
+{% endfor %}
+
+{% endblock body %}

@@ -1,121 +1,36 @@
-<!DOCTYPE HTML>
-<!--
-    Alpha by HTML5 UP
-    html5up.net | @ajlkn
-    Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
-<html>
-    <head>
-        <title>Voting | Kudos</title>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <!--[if lte IE 8]><script src="/static/assets/js/ie/html5shiv.js"></script><![endif]-->
-        <link rel="stylesheet" href="/static/assets/css/main.css" />
-        <!--[if lte IE 8]><link rel="stylesheet" href="/static/assets/css/ie8.css" /><![endif]-->
-        <link rel="icon" href="/static/images/oscar.png"/>
+{% extends 'layout.html' %}
 
-        <link rel="stylesheet" href="/static/assets/font-awesome/css/font-awesome.min.css"/>
-        <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
-        <link rel="stylesheet" href="/static/assets/dist/css/lobibox.min.css">
-        <script src="/static/assets/dist/js/lobibox.min.js"></script>
-        <script>
-            Lobibox.notify.DEFAULTS = $.extend({}, Lobibox.notify.DEFAULTS, {
-                iconSource: 'fontAwesome'
-            });
-            Lobibox.notify.DEFAULTS = $.extend({}, Lobibox.notify.DEFAULTS, {
-                sound: false
-            });
-        </script>
-    </head>
-    <body>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <script>
-                        Lobibox.notify("{{ category }}", {
-                            msg: "{{ message }}"
-                        });
-                    </script>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        <div id="page-wrapper">
+{% block title %}Voting | Kudos{% endblock %}
 
-            <!-- Header -->
-                <header id="header">
-                    <h1><a href="{{ url_for('index') }}">Kudos</a> by Scotch'n'Soda Theatre</h1>
-                    <nav id="nav">
-                        <ul>
-                            <li><a href="{{ url_for('index') }}">Home</a></li>
-                            {% if current_user.is_authenticated %}
-                                <li><a href="{{ url_for('awards') }}">Awards</a></li>
-                                <li>
-                                    <a class="icon fa-angle-down">{{ current_user.username }}</a>
-                                    <ul>
-                                        <li><a href="{{ url_for('change_password') }}">Change Password</a></li>
-                                        <li><a href="{{ url_for('signout') }}">Sign Out</a></li>
-                                    </ul>
-                                </li>
-                            {% else %}
-                                <li><a href="{{ url_for('signin') }}">Sign In</a></li>
-                                <li><a href="{{ url_for('signup') }}" class="button">Sign Up</a></li>
-                            {% endif %}
-                        </ul>
-                    </nav>
-                </header>
-
-            <!-- Main -->
-                <section id="main" class="container">
-                    <header>
-                        <h2>Voting!</h2>
-                        <p>Use the buttons below to vote for your favorite in each category! Voting is immediate and modifiable, no need to submit!</p>
-                    </header>
-                    <div class="box">
-                        <span class="image featured"><img src="/static/images/snsbanner.png" alt="" /></span>
-                        {% for award in awards %}
-                            <h2><b style="color: #d77a3d">{{ award.name }}</b></h2>
-                            <ul class="actions">
-                                {% for nom in award.nominations %}
-                                    {% if nom in current_user.selections %}
-                                        <li style="font-size: 120%"><a class="button alt icon fa-check small" name="nom{{ nom.id }}" id="{{ nom.id }}" onclick="submit_vote(this.id)" style="background-color: lightgreen">Vote</a> {{ nom.name }}</li>
-                                    {% else %}
-                                        <li style="font-size: 120%"><a class="button alt icon fa-check small" name="nom{{ nom.id }}" id="{{ nom.id }}" onclick="submit_vote(this.id)" style="background-color: transparent;">Vote</a> {{ nom.name }}</li>
-                                    {% endif %}
-                                    <br/>
-                                {% endfor %}
-                            </ul>
-                            {% if award != awards[-1] %}
-                                {# Only put lines between awards, not after the last one #}
-                                <hr>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </section>
-
-            <!-- Footer -->
-                <footer id="footer">
-                    <ul class="icons">
-                        <li><a href="https://www.facebook.com/snstheatre/" class="icon fa-facebook" target="_blank"><span class="label">Facebook</span></a></li>
-                        <li><a href="https://www.instagram.com/scotchnsodatheatre" class="icon fa-instagram" target="_blank"><span class="label">Instagram</span></a></li>
-                        <li><a href="https://www.twitter.com/snstheatre" class="icon fa-twitter" target="_blank"><span class="label">Twitter</span></a></li>
-                        <li><a href="https://github.com/gseastream/kudos" class="icon fa-github" target="_blank"><span class="label">Github</span></a></li>
-                    </ul>
-                    <ul class="copyright">
-                        <li>&copy; Scotch'n'Soda Theatre</li><li>Website: Grant Seastream</li><li>Design: <a href="http://html5up.net" target="_blank">HTML5 UP</a></li>
-                    </ul>
-                </footer>
-
+{% block body %}
+<!-- Main -->
+    <section id="main" class="container">
+        <header>
+            <h2>Voting!</h2>
+            <p>Use the buttons below to vote for your favorite in each category! Voting is immediate and modifiable, no need to submit!</p>
+        </header>
+        <div class="box">
+            <span class="image featured"><img src="/static/images/snsbanner.png" alt="" /></span>
+            {% for award in awards %}
+                <h2><b style="color: #d77a3d">{{ award.name }}</b></h2>
+                <ul class="actions">
+                    {% for nom in award.nominations %}
+                        {% if nom in current_user.selections %}
+                            {% set bcolor = "lightgreen" %}
+                        {% else %}
+                            {% set bcolor = "transparent" %}
+                        {% endif %}
+                        <li style="font-size: 120%"><a class="button alt icon fa-check small" name="nom{{ nom.id }}" id="{{ nom.id }}" onclick="submit_vote(this.id)" style="background-color: {{ bcolor }};">Vote</a> {{ nom.name }}</li>
+                        <br/>
+                    {% endfor %}
+                </ul>
+                {% if award != awards[-1] %}
+                    {# Only put lines between awards, not after the last one #}
+                    <hr>
+                {% endif %}
+            {% endfor %}
         </div>
+    </section>
+{% endblock body %}
 
-        <!-- Scripts -->
-            <script src="/static/assets/js/jquery.min.js"></script>
-            <script src="/static/assets/js/jquery.dropotron.min.js"></script>
-            <script src="/static/assets/js/jquery.scrollgress.min.js"></script>
-            <script src="/static/assets/js/skel.min.js"></script>
-            <script src="/static/assets/js/util.js"></script>
-            <!--[if lte IE 8]><script src="/static/assets/js/ie/respond.min.js"></script><![endif]-->
-            <script src="/static/assets/js/main.js"></script>
-            <script src="/static/assets/js/voting_buttons.js"></script>
-
-    </body>
-</html>
+{% block scripts %}<script src="/static/assets/js/voting_buttons.js"></script>{% endblock %}
