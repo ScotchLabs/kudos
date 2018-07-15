@@ -1,18 +1,22 @@
+import itsdangerous, json, atexit
+
 from flask import redirect, render_template, url_for, send_file, abort, \
     flash, request
 from flask_login import login_user, logout_user, current_user, login_required
 from flask_mail import Message
 from flask_admin import Admin, AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView
-from werkzeug.exceptions import default_exceptions
-from urllib.parse import urlparse, urljoin
-import itsdangerous
-import json
+
 from app_manager import app, db, ts, mail
 from forms import (SignupForm, LoginForm, UsernameForm, ResetPasswordForm,
                    ChangePasswordForm, NominationForm, BanForm, AdminForm)
 from models import User, Award, Nomination, State
 from login_manager import login_manager
+
+from werkzeug.exceptions import default_exceptions
+from urllib.parse import urlparse, urljoin
+from apscheduler.schedulers.background import BackgroundScheduler
+from dateutil.parser import parse
 
 application = app # name needed for eb
 
@@ -375,8 +379,7 @@ class MyAdminIndexView(AdminIndexView):
         if p is not None:
             if not p in (0,1,2):
                 abort(404)
-            db.session.query(State).first().phase = p
-            db.session.commit()
+            assign_phase(p)
             flash("Phase changed to %s" %
                 ("static", "nominating", "voting")[p], "success")
         full = self.get_full()
@@ -448,6 +451,40 @@ def phase():
 
 def list_awards():
     return Award.query.order_by(Award.order).all()
+
+def assign_phase(p):
+    obj = State.query.first()
+    obj.phase = p
+    db.session.add(obj)
+    db.session.commit()
+
+@app.before_first_request
+def initScheduler():
+    nom = dict(
+        func=assign_phase,
+        args=[1],
+        run_date=parse("2018-07-15 02:08:00 PM MDT"),
+        id='static',
+        name='Change phase to nominating')
+    vote = dict(
+        func=assign_phase,
+        args=[2],
+        run_date=parse("2018-07-15 02:08:00 PM MDT"),
+        id='vote',
+        name='Change phase to voting')
+    static = dict(
+        func=assign_phase,
+        args=[0],
+        run_date=parse("2018-07-15 02:08:00 PM MDT"),
+        id='static',
+        name='Change phase to static')
+
+    scheduler = BackgroundScheduler()
+    # scheduler.add_job(**vote)
+    # scheduler.add_job(**static)
+    # scheduler.add_job(**nom)
+    scheduler.start()
+    atexit.register(lambda: scheduler.shutdown())
 
 if __name__ == "__main__":
     app.run(debug=True) # should only be on debug when run locally, not on eb
