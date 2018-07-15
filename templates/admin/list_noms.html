@@ -5,7 +5,7 @@
 <h2>{{ award.name }}</h2>
 {% for nom in award.nominations %}
     <b>{{ nom.votes }} votes</b> | {{ nom.name }} | {{ nom.creator.username }} | <a href="{{ url_for('admin.remove') }}?nom={{ nom.id }}">Remove</a> | <a href="{{ url_for('admin.remove') }}?nom={{ nom.id }}&warn={{ nom.creator.id }}">Remove and Warn</a> | <a href="{{ url_for('admin.remove') }}?nom={{ nom.id }}&ban={{ nom.creator.id }}">Remove and Ban</a>
-    <br/>
+    <br>
 {% endfor %}
 
 {% endblock body %}

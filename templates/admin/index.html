@@ -12,7 +12,7 @@
     <a href="{{ url_for('admin.index') }}?full" class="btn btn-default {{ 'disabled' if full }}">Full Nom List</a>
 </div>
 
-<br/>
+<br>
 
 <a href="/admin/setphase?{{ 'full&' if full }}phase=0" class="btn btn-default {{ 'disabled' if phase == 0 }}">Switch to static phase</a>
 <a href="/admin/setphase?{{ 'full&' if full }}phase=1" class="btn btn-default {{ 'disabled' if phase == 1 }}">Switch to nominating phase</a>

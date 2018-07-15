@@ -21,7 +21,7 @@
                             {% set bcolor = "transparent" %}
                         {% endif %}
                         <li style="font-size: 120%"><a class="button alt icon fa-check small" name="nom{{ nom.id }}" id="{{ nom.id }}" onclick="submit_vote(this.id)" style="background-color: {{ bcolor }};">Vote</a> {{ nom.name }}</li>
-                        <br/>
+                        <br>
                     {% endfor %}
                 </ul>
                 {% if award != awards[-1] %}
