@@ -10,7 +10,7 @@
             <p>Expired Link</p>
         </header>
         <div class="box">
-            <p>Looks like your email confirmation link has expired. Click <a href="/newlink/{{ token }}">here</a> to send a new one.</p>
+            <p>Looks like your email confirmation link has expired. Click <a href="{{ url_for('new_link', token=token) }}">here</a> to send a new one.</p>
         </div>
     </section>
 {% endblock body %}

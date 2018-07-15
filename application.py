@@ -8,7 +8,7 @@ from werkzeug.exceptions import default_exceptions
 from urllib.parse import urlparse, urljoin
 import itsdangerous
 import json
-from app_manager import app, db, ts, mail, basic_auth, award_order
+from app_manager import app, db, ts, mail, award_order
 from forms import (SignupForm, LoginForm, UsernameForm, ResetPasswordForm,
                    ChangePasswordForm, NominationForm, BanForm, AdminForm)
 from models import User, Award, Nomination, State

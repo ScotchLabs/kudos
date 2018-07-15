@@ -17,8 +17,6 @@ MAIL_USERNAME
 MAIL_PASSWORD
 MAIL_DEFAULT_SENDER = MAIL_USERNAME # unless you want to specify otherwise
 REMEMBER_COOKIE_DURATION = 604800 # 1 week in seconds, for flask-login
-BASIC_AUTH_USERNAME
-BASIC_AUTH_PASSWORD
 ```
 
 # Google Mail

@@ -14,20 +14,20 @@
 
 <br>
 
-<a href="/admin/setphase?{{ 'full&' if full }}phase=0" class="btn btn-default {{ 'disabled' if phase == 0 }}">Switch to static phase</a>
-<a href="/admin/setphase?{{ 'full&' if full }}phase=1" class="btn btn-default {{ 'disabled' if phase == 1 }}">Switch to nominating phase</a>
-<a href="/admin/setphase?{{ 'full&' if full }}phase=2" class="btn btn-default {{ 'disabled' if phase == 2 }}">Switch to voting phase</a>
+<a href="{{ url_for('admin.set_phase') }}?{{ 'full&' if full }}phase=0" class="btn btn-default {{ 'disabled' if phase == 0 }}">Switch to static phase</a>
+<a href="{{ url_for('admin.set_phase') }}?{{ 'full&' if full }}phase=1" class="btn btn-default {{ 'disabled' if phase == 1 }}">Switch to nominating phase</a>
+<a href="{{ url_for('admin.set_phase') }}?{{ 'full&' if full }}phase=2" class="btn btn-default {{ 'disabled' if phase == 2 }}">Switch to voting phase</a>
 
 <br><br>
 
-<form method="POST" action="/admin/ban{{ '?full' if full }}">
+<form method="POST" action="{{ url_for('admin.ban') }}{{ '?full' if full }}">
     {{ bform.csrf_token }}
     {{ bform.banuser() }}
     {{ bform.ban }} {{ bform.unban }}
     {{ render_errors(bform.banuser) }}
 </form>
 
-<form method="POST" action="/admin/admin{{ '?full' if full }}">
+<form method="POST" action="{{ url_for('admin.change_admin') }}{{ '?full' if full }}">
     {{ aform.csrf_token }}
     {{ aform.adminuser() }}
     {{ aform.give }} {{ aform.take }}
@@ -40,7 +40,7 @@
         <h2>{{ award.name }}</h2>
         {% for nom in award.nominations %}
             <b>{{ nom.votes }} votes</b> | {{ nom.name }} | {{ nom.creator.username }} | <a href="{{ url_for('admin.remove') }}?full&nom={{ nom.id }}">Remove</a> | <a href="{{ url_for('admin.remove') }}?full&nom={{ nom.id }}&warn={{ nom.creator.id }}">Remove and Warn</a> | <a href="{{ url_for('admin.remove') }}?full&nom={{ nom.id }}&ban={{ nom.creator.id }}">Remove, Ban, Notify</a>
-            <br/>
+            <br>
         {% endfor %}
     {% else %}
         <h2><a href="{{ url_for('admin.list_noms') }}?nom={{ award.id }}">{{ award.name }}</a></h2>
