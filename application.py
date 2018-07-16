@@ -79,10 +79,10 @@ def resend():
             username=form.username.data.lower()).first_or_404()
         if user.email_confirmed == True:
             flash("Your email is already confirmed!", "error")
-            return render_template('resend.html', form=form)
-        send_confirm_link(user.email)
-        flash("New confirmation link sent, check your email!", "success")
-        return redirect(url_for('index'))
+        else:
+            send_confirm_link(user.email)
+            flash("New confirmation link sent, check your email!", "success")
+            return redirect(url_for('index'))
     return render_template('resend.html', form=form)
 
 @app.route('/signin', methods=["GET", "POST"])
@@ -272,11 +272,23 @@ class MyAdminIndexView(AdminIndexView):
             else:
                 return login_manager.unauthorized()
 
-    @expose("/", methods=["GET"])
+    @expose("/", methods=["GET", "POST"])
     def index(self):
-        bform = BanForm()
-        aform = AdminForm()
         full = self.get_full()
+        bform = BanForm()
+        if (bform.ban.data or bform.unban.data) and bform.validate_on_submit():
+            self.ban(bform)
+            if full:
+                return redirect("/admin/?full")
+            else:
+                return redirect("/admin/")
+        aform = AdminForm()
+        if (aform.give.data or aform.take.data) and aform.validate_on_submit():
+            self.change_admin(aform)
+            if full:
+                return redirect("/admin/?full")
+            else:
+                return redirect("/admin/")
         return self.render("admin/index.html", bform=bform, aform=aform,
                            awards=list_awards(), full=full, phase=phase())
 
@@ -289,58 +301,6 @@ class MyAdminIndexView(AdminIndexView):
         n = request.args.get('nom', type=int)
         award = Award.query.filter_by(id=n).first_or_404()
         return self.render("admin/list_noms.html", award=award)
-
-    @expose("/ban", methods=["POST"])
-    def ban(self):
-        full = self.get_full()
-        bform = BanForm()
-        if bform.validate_on_submit():
-            user = User.query.filter_by(
-                username=bform.banuser.data.lower()).first_or_404()
-            msg = None
-            if bform.ban.data:
-                user.ban()
-                msg = ("Banned %s" % user.username, "success")
-            elif bform.unban.data:
-                user.unban()
-                msg = ("Unbanned %s" % user.username, "success")
-            db.session.add(user)
-            db.session.commit()
-            if msg is not None:
-                flash(*msg) # don't flash until commit passes
-            if full:
-                return redirect("/admin/?full")
-            else:
-                return redirect("/admin/")
-        aform = AdminForm()
-        return self.render("admin/index.html", bform=bform, aform=aform,
-                           awards=list_awards(), full=full, phase=phase())
-
-    @expose("/admin", methods=["POST"])
-    def change_admin(self):
-        full = self.get_full()
-        aform = AdminForm()
-        if aform.validate_on_submit():
-            user = User.query.filter_by(
-                username=aform.adminuser.data.lower()).first_or_404()
-            msg = None
-            if aform.give.data:
-                user.give_admin()
-                msg = ("Made %s an admin" % user.username, "success")
-            elif aform.take.data:
-                user.take_admin()
-                msg = ("Removed %s as admin" % user.username, "success")
-            db.session.add(user)
-            db.session.commit()
-            if msg is not None:
-                flash(*msg) # don't flash until commit passes
-            if full:
-                return redirect("/admin/?full")
-            else:
-                return redirect("/admin/")
-        bform = BanForm()
-        return self.render("admin/index.html", bform=bform, aform=aform,
-                           awards=list_awards(), full=full, phase=phase())
 
     @expose("/remove", methods=["GET"])
     def remove(self):
@@ -387,6 +347,36 @@ class MyAdminIndexView(AdminIndexView):
             return redirect("/admin/?full")
         else:
             return redirect("/admin/")
+
+    def ban(self, bform):
+        user = User.query.filter_by(
+            username=bform.banuser.data.lower()).first_or_404()
+        msg = None
+        if bform.ban.data:
+            user.ban()
+            msg = ("Banned %s" % user.username, "success")
+        elif bform.unban.data:
+            user.unban()
+            msg = ("Unbanned %s" % user.username, "success")
+        db.session.add(user)
+        db.session.commit()
+        if msg is not None:
+            flash(*msg) # don't flash until commit passes
+
+    def change_admin(self, aform):
+        user = User.query.filter_by(
+            username=aform.adminuser.data.lower()).first_or_404()
+        msg = None
+        if aform.give.data:
+            user.give_admin()
+            msg = ("Made %s an admin" % user.username, "success")
+        elif aform.take.data:
+            user.take_admin()
+            msg = ("Removed %s as admin" % user.username, "success")
+        db.session.add(user)
+        db.session.commit()
+        if msg is not None:
+            flash(*msg) # don't flash until commit passes
 
     def get_full(self):
         full = request.args.get('full')

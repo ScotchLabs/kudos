@@ -29,7 +29,7 @@ def init_awards():
     "Best Featured Performer",
     "Best Ensemble",
     "Best Duo",
-    "Best Improv Performer",
+    "Best Improv Moment",
     "Best Sketch Actor",
     "Best Cover",
     "Worst Cover",
@@ -62,16 +62,13 @@ def init_awards():
     "King and Queen of the Black Chairs Award",
     "Best Late Show Moment",
     "Nathaniel Biggs Coolest Uncle Award",
+    "Hottest Gossip",
     "New Kudos Category",
     "Retire a Kudos Category",
     ]
 
-    awards = []
     for i in range(len(award_order)):
-        awards.append(Award(name=award_order[i], order=(i + 1) * 10))
-
-    for a in awards:
-        db.session.add(a)
+        db.session.add(Award(name=award_order[i], order=(i + 1) * 10))
 
     db.session.commit()
 
@@ -101,8 +98,8 @@ def init_some_noms():
     db.session.commit()
 
 def init_state():
-    state = State(phase=0)
-    db.session.add(state)
+    db.session.query(State).delete()
+    db.session.add(State(phase=0))
     db.session.commit()
 
 def clear_votes():
