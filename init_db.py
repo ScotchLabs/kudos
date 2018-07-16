@@ -1,6 +1,6 @@
 from app_manager import db
 from models import User, Award, Nomination, State
-import os
+import os, random
 
 def init_db():
     db.drop_all()
@@ -9,6 +9,11 @@ def init_db():
     init_awards()
     init_state()
 
+    db.session.commit()
+
+def init_state():
+    db.session.query(State).delete()
+    db.session.add(State(phase=0))
     db.session.commit()
 
 def init_awards():
@@ -73,13 +78,8 @@ def init_awards():
     db.session.commit()
 
 def init_some_noms():
-    """Not destructive, will add these to the first 5 awards"""
-    user = User.query.filter_by(username="gseastre").first()
-    if user is None:
-        user = User(username="gseastre", password="iamgroont",
-            email_confirmed=True, is_admin=True)
-        db.session.add(user)
-
+    # Not destructive, will add these to the first 5 awards
+    user = init_myself()
     awards = db.session.query(Award).all()
     assert(len(awards) >= 5)
 
@@ -93,14 +93,46 @@ def init_some_noms():
     awards[4].nominations.append(Nomination(name="Hey there!", creator=user))
     awards[4].nominations.append(Nomination(name="American Vandal", creator=user))
     awards[4].nominations.append(Nomination(name="Alex Trimboli", creator=user))
-    awards[4].nominations.append(Nomination(name="Abby Pingboi", creator=user))
+    awards[4].nominations.append(Nomination(name="That kid who played Igor", creator=user))
 
     db.session.commit()
 
-def init_state():
-    db.session.query(State).delete()
-    db.session.add(State(phase=0))
+def init_many_noms():
+    user = init_myself()
+
+    choices = [
+    "Grant Seastream",
+    "Stephen Colbert",
+    "American Vandal",
+    "Alex Trimboli",
+    "Chicago",
+    "Young Frankenstein",
+    "That time everyone did that cool thing and it was amazing",
+    "That time we didn't go to Kennywood",
+    "Vermin Supreme",
+    "Free ponies for all Americans",
+    "No food in the stood thoot",
+    "Simon says",
+    "Listen to your mother",
+    "Why can't weeeee be friends, why can't weeeeeeeeeeeee be friends???",
+    ]
+
+    awards = db.session.query(Award).all()
+
+    for awd in awards:
+        for i in range(7):
+            awd.nominations.append(Nomination(name=random.choice(choices), creator=user))
+
     db.session.commit()
+
+def init_myself():
+    user = User.query.filter_by(username="gseastre").first()
+    if user is None:
+        user = User(username="gseastre", password="iamgroont",
+            email_confirmed=True, is_admin=True)
+        db.session.add(user)
+        db.session.commit()
+    return user
 
 def clear_votes():
     for user in User.query.all():
