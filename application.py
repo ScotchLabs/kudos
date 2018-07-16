@@ -8,8 +8,8 @@ from flask_admin import Admin, AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView
 
 from app_manager import app, db, ts, mail
-from forms import (SignupForm, LoginForm, UsernameForm, ResetPasswordForm,
-                   ChangePasswordForm, NominationForm, BanForm, AdminForm)
+from forms import SignupForm, LoginForm, UsernameForm, ResetPasswordForm, \
+    ChangePasswordForm, NominationForm, BanForm, AdminForm, NomIDForm
 from models import User, Award, Nomination, State
 from login_manager import login_manager
 
@@ -276,21 +276,29 @@ class MyAdminIndexView(AdminIndexView):
     def index(self):
         full = self.get_full()
         bform = BanForm()
+        aform = AdminForm()
+        nform = NomIDForm()
         if (bform.ban.data or bform.unban.data) and bform.validate_on_submit():
             self.ban(bform)
             if full:
                 return redirect("/admin/?full")
             else:
                 return redirect("/admin/")
-        aform = AdminForm()
         if (aform.give.data or aform.take.data) and aform.validate_on_submit():
             self.change_admin(aform)
             if full:
                 return redirect("/admin/?full")
             else:
                 return redirect("/admin/")
+        if ((nform.rem.data or nform.rwarn.data or nform.rban.data) and
+                nform.validate_on_submit()):
+            self.remove_nom(nform)
+            if full:
+                return redirect("/admin/?full")
+            else:
+                return redirect("/admin/")
         return self.render("admin/index.html", bform=bform, aform=aform,
-                           awards=list_awards(), full=full, phase=phase())
+            nform=nform, awards=list_awards(), full=full, phase=phase())
 
     @expose("/user_list", methods=["GET"])
     def list_users(self):
@@ -298,8 +306,8 @@ class MyAdminIndexView(AdminIndexView):
 
     @expose("/noms", methods=["GET"])
     def list_noms(self):
-        n = request.args.get('nom', type=int)
-        award = Award.query.filter_by(id=n).first_or_404()
+        a = request.args.get('awd', type=int)
+        award = Award.query.filter_by(id=a).first_or_404()
         return self.render("admin/list_noms.html", award=award)
 
     @expose("/remove", methods=["GET"])
@@ -377,6 +385,31 @@ class MyAdminIndexView(AdminIndexView):
         db.session.commit()
         if msg is not None:
             flash(*msg) # don't flash until commit passes
+
+    def remove_nom(self, nform):
+        nom = Nomination.query.filter_by(id=nform.nomid.data).first_or_404()
+        user = nom.creator
+        # any of the buttons will remove the nom
+        db.session.delete(nom)
+        db.session.commit()
+        flash("Removed %r" % nom, "success")
+
+        if nform.rwarn.data:
+            subject = "Inappropriate Content Warning"
+            html = render_template('email/warning.html')
+            send_email(user.email, subject, html)
+            flash("Warning sent to %s" % user.username, "success")
+
+        elif nform.rban.data:
+            user.ban()
+            db.session.add(user)
+            db.session.commit() # don't send email until commit passes
+            subject = "Your account has been banned"
+            html = render_template('email/ban.html')
+            send_email(user.email, subject, html)
+            flash("Banned and notified %s" % user.username, "success")
+
+        db.session.commit()
 
     def get_full(self):
         full = request.args.get('full')

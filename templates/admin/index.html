@@ -22,16 +22,23 @@
 
 <form method="POST" action="{{ url_for('admin.index') }}{{ '?full' if full }}">
     {{ bform.csrf_token }}
-    {{ bform.banuser() }}
+    {{ bform.banuser(placeholder=bform.banuser.label.text) }}<br>
     {{ bform.ban }} {{ bform.unban }}
     {{ render_errors(bform.banuser) }}
 </form>
-
+<br>
 <form method="POST" action="{{ url_for('admin.index') }}{{ '?full' if full }}">
     {{ aform.csrf_token }}
-    {{ aform.adminuser() }}
+    {{ aform.adminuser(placeholder=aform.adminuser.label.text) }}<br>
     {{ aform.give }} {{ aform.take }}
     {{ render_errors(aform.adminuser) }}
+</form>
+<br>
+<form method="POST" action="{{ url_for('admin.index') }}{{ '?full' if full }}">
+    {{ nform.csrf_token }}
+    {{ nform.nomid(placeholder=nform.nomid.label.text) }}<br>
+    {{ nform.rem }} {{ nform.rwarn }} {{ nform.rban }}
+    {{ render_errors(nform.nomid) }}
 </form>
 
 <h1>Nominations</h1>
@@ -39,11 +46,11 @@
     {% if full %}
         <h2>{{ award.name }}</h2>
         {% for nom in award.nominations %}
-            <b>{{ nom.votes }} votes</b> | {{ nom.name }} | {{ nom.creator.username }} | <a href="{{ url_for('admin.remove') }}?full&nom={{ nom.id }}">Remove</a> | <a href="{{ url_for('admin.remove') }}?full&nom={{ nom.id }}&warn={{ nom.creator.id }}">Remove and Warn</a> | <a href="{{ url_for('admin.remove') }}?full&nom={{ nom.id }}&ban={{ nom.creator.id }}">Remove, Ban, & Notify</a>
+            <b>{{ nom.votes }} votes</b> | {{ nom.name }} | {{ nom.creator.username }} | ID={{ nom.id }}
             <br>
         {% endfor %}
     {% else %}
-        <h2><a href="{{ url_for('admin.list_noms') }}?nom={{ award.id }}">{{ award.name }}</a></h2>
+        <h2><a href="{{ url_for('admin.list_noms') }}?awd={{ award.id }}">{{ award.name }}</a></h2>
     {% endif %}
 {% endfor %}
 
