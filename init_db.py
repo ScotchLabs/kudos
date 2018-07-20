@@ -115,12 +115,18 @@ def init_many_noms():
     "Simon says",
     "Listen to your mother",
     "Why can't weeeee be friends, why can't weeeeeeeeeeeee be friends???",
+    "Never gonna give you up",
+    "Never gonna let you down",
+    "Can we like please rename the improv award I mean come on it's a team sport",
+    "I hardly know her!",
+    "Sweeney Todd",
+    "Jimmy Fallon isn't funny",
     ]
 
     awards = db.session.query(Award).all()
 
     for awd in awards:
-        for i in range(7):
+        for i in range(10):
             awd.nominations.append(Nomination(name=random.choice(choices), creator=user))
 
     db.session.commit()
