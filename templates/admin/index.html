@@ -50,7 +50,7 @@
             <br>
         {% endfor %}
     {% else %}
-        <h2><a href="{{ url_for('admin.list_noms') }}?awd={{ award.id }}">{{ award.name }}</a></h2>
+        <h2><a href="{{ url_for('admin.list_noms', awd=award.id) }}">{{ award.name }}</a></h2>
     {% endif %}
 {% endfor %}
 

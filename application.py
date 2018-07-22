@@ -274,29 +274,20 @@ class MyAdminIndexView(AdminIndexView):
 
     @expose("/", methods=["GET", "POST"])
     def index(self):
-        full = self.get_full()
         bform = BanForm()
         aform = AdminForm()
         nform = NomIDForm()
         if (bform.ban.data or bform.unban.data) and bform.validate_on_submit():
             self.ban(bform)
-            if full:
-                return redirect("/admin/?full")
-            else:
-                return redirect("/admin/")
+            return self.check_full_index()
         if (aform.give.data or aform.take.data) and aform.validate_on_submit():
             self.change_admin(aform)
-            if full:
-                return redirect("/admin/?full")
-            else:
-                return redirect("/admin/")
+            return self.check_full_index()
         if ((nform.rem.data or nform.rwarn.data or nform.rban.data) and
                 nform.validate_on_submit()):
-            self.remove_nom(nform)
-            if full:
-                return redirect("/admin/?full")
-            else:
-                return redirect("/admin/")
+            self.remove_nom(nform.nomid.data, nform.rwarn.data, nform.rban.data)
+            return self.check_full_index()
+        full = self.get_full()
         return self.render("admin/index.html", bform=bform, aform=aform,
             nform=nform, awards=list_awards(), full=full, phase=phase())
 
@@ -312,34 +303,15 @@ class MyAdminIndexView(AdminIndexView):
 
     @expose("/remove", methods=["GET"])
     def remove(self):
+        # url used by the nom list subpages to remove and such
+        # it doesn't matter what actual argument is passed for warn or ban
+        a = request.args.get('awd', type=int)
         n = request.args.get('nom', type=int)
-        w = request.args.get('warn', type=int)
-        b = request.args.get('ban', type=int)
+        w = request.args.get('warn')
+        b = request.args.get('ban')
         if n is not None:
-            nom = Nomination.query.filter_by(id=n).first_or_404()
-            db.session.delete(nom)
-            db.session.commit()
-            flash("Removed %r" % nom, "success")
-        if w is not None:
-            user = User.query.filter_by(id=w).first_or_404()
-            subject = "Inappropriate Content Warning"
-            html = render_template('email/warning.html')
-            send_email(user.email, subject, html)
-            flash("Warning sent to %s" % user.username, "success")
-        if b is not None:
-            user = User.query.filter_by(id=b).first_or_404()
-            user.ban()
-            db.session.add(user)
-            db.session.commit()
-            subject = "Your account has been banned"
-            html = render_template('email/ban.html')
-            send_email(user.email, subject, html)
-            flash("Banned and notified %s" % user.username, "success")
-        full = self.get_full()
-        if full:
-            return redirect("/admin/?full")
-        else:
-            return redirect("/admin/")
+            self.remove_nom(n, w is not None, b is not None)
+        return redirect(url_for("admin.list_noms", awd=a))
 
     @expose("/setphase", methods=["GET"])
     def set_phase(self):
@@ -348,13 +320,9 @@ class MyAdminIndexView(AdminIndexView):
             if not p in (0,1,2):
                 abort(404)
             assign_phase(p)
-            flash("Phase changed to %s" %
-                ("static", "nominating", "voting")[p], "success")
-        full = self.get_full()
-        if full:
-            return redirect("/admin/?full")
-        else:
-            return redirect("/admin/")
+            flash("Phase changed to %s" % ("static", "nominating", "voting")[p],
+                  "success")
+        return self.check_full_index()
 
     def ban(self, bform):
         user = User.query.filter_by(
@@ -386,21 +354,21 @@ class MyAdminIndexView(AdminIndexView):
         if msg is not None:
             flash(*msg) # don't flash until commit passes
 
-    def remove_nom(self, nform):
-        nom = Nomination.query.filter_by(id=nform.nomid.data).first_or_404()
+    def remove_nom(self, nomid, warn, ban):
+        nom = Nomination.query.filter_by(id=nomid).first_or_404()
+        awd = nom.award
         user = nom.creator
         # any of the buttons will remove the nom
         db.session.delete(nom)
         db.session.commit()
-        flash("Removed %r" % nom, "success")
-
-        if nform.rwarn.data:
+        flash("Removed %r ('%s' for '%s')" % (nom, nom.name, awd.name),
+              "success")
+        if warn:
             subject = "Inappropriate Content Warning"
             html = render_template('email/warning.html')
             send_email(user.email, subject, html)
             flash("Warning sent to %s" % user.username, "success")
-
-        elif nform.rban.data:
+        elif ban:
             user.ban()
             db.session.add(user)
             db.session.commit() # don't send email until commit passes
@@ -409,15 +377,17 @@ class MyAdminIndexView(AdminIndexView):
             send_email(user.email, subject, html)
             flash("Banned and notified %s" % user.username, "success")
 
-        db.session.commit()
+    def check_full_index(self):
+        full = self.get_full()
+        if full:
+            return redirect("/admin/?full")
+        else:
+            return redirect("/admin/")
 
     def get_full(self):
         full = request.args.get('full')
-        if full is None:
-            return False
-        else:
-            # if full appears as anything in request, render the full page
-            return True
+        # if full appears as anything in request, render the full page
+        return full is not None
 
 class MyModelView(ModelView):
     is_accessible = MyAdminIndexView.is_accessible
