@@ -11,7 +11,8 @@
         </header>
         <div class="box">
             <div class="align-center">
-                {{ error }}
+                <h3>{{ error.code }} {{ error.name }}</h3>
+                {{ error.description }}
                 <br><br><br>
                 <a href="{{ url_for('index') }}" class="button">Return to Home Page</a>
             </div>
