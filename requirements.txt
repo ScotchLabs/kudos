@@ -4,7 +4,7 @@ bcrypt==3.1.4
 blinker==1.4
 cffi==1.11.5
 click==6.7
-cryptography==2.2.2
+cryptography==2.3
 Flask==1.0.2
 Flask-Admin==1.5.1
 Flask-Bcrypt==0.7.1
