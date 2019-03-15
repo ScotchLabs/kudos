@@ -482,4 +482,4 @@ def initScheduler():
     atexit.register(lambda: scheduler.shutdown())
 
 if __name__ == "__main__":
-    app.run(debug=False) # should only be on debug when run locally, not on eb
+    app.run(debug=True) # should only be on debug when run locally, not on eb
