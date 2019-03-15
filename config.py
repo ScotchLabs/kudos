@@ -1,7 +1,7 @@
 import os
 
 try:
-    from secrets import key, email, password
+    from config_secrets import key, email, password
 except ImportError:
     key = email = password = None
 
