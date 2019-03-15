@@ -1,6 +1,6 @@
 *.pyc
 .DS_Store
-config.py
+secrets.py
 data.db
 
 # Elastic Beanstalk Files
