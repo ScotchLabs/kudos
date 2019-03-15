@@ -365,7 +365,7 @@ class MyAdminIndexView(AdminIndexView):
               "success")
         if warn:
             subject = "Inappropriate Content Warning"
-            html = render_template('email/warning.html')
+            html = render_template('email/warning.html', award_name=awd.name)
             send_email(user.email, subject, html)
             flash("Warning sent to %s" % user.username, "success")
         elif ban:
