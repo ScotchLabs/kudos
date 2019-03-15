@@ -17,6 +17,7 @@ from werkzeug.exceptions import default_exceptions
 from urllib.parse import urlparse, urljoin
 from apscheduler.schedulers.background import BackgroundScheduler
 from dateutil.parser import parse
+from dateutil.tz import gettz
 
 application = app # name needed for eb
 
@@ -453,29 +454,30 @@ def assign_phase(p):
 
 @app.before_first_request
 def initScheduler():
+    tzinfos = {"EDT": gettz("US/Eastern")}
     nom = dict(
         func=assign_phase,
         args=[1],
-        run_date=parse("2018-07-15 02:08:00 PM MDT"),
-        id='static',
+        run_date=parse("2019-03-15 03:00:00 PM EDT", tzinfos=tzinfos),
+        id='nom',
         name='Change phase to nominating')
     vote = dict(
         func=assign_phase,
         args=[2],
-        run_date=parse("2018-07-15 02:08:00 PM MDT"),
+        run_date=parse("2019-03-15 03:15:00 PM EDT", tzinfos=tzinfos),
         id='vote',
         name='Change phase to voting')
     static = dict(
         func=assign_phase,
         args=[0],
-        run_date=parse("2018-07-15 02:08:00 PM MDT"),
+        run_date=parse("2019-03-15 03:30:00 PM EDT", tzinfos=tzinfos),
         id='static',
         name='Change phase to static')
 
     scheduler = BackgroundScheduler()
-    # scheduler.add_job(**vote)
-    # scheduler.add_job(**static)
-    # scheduler.add_job(**nom)
+    scheduler.add_job(**nom)
+    scheduler.add_job(**vote)
+    scheduler.add_job(**static)
     scheduler.start()
     atexit.register(lambda: scheduler.shutdown())
 
