@@ -41,7 +41,8 @@ class User(db.Model, UserMixin):
 
     @password.setter
     def password(self, plaintext):
-        self._password = bcrypt.generate_password_hash(plaintext)
+        self._password = \
+            bcrypt.generate_password_hash(plaintext).decode('utf-8')
         self.reset_token() # reset the token when you change the password
 
     def is_correct_password(self, plaintext):
