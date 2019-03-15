@@ -13,6 +13,7 @@ Flask-Mail==0.9.1
 Flask-SQLAlchemy==2.3.2
 Flask-SSLify==0.1.5
 Flask-WTF==0.14.2
+gunicorn==19.9.0
 idna==2.7
 itsdangerous==0.24
 Jinja2==2.10
