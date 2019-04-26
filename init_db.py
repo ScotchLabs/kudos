@@ -38,7 +38,7 @@ def init_awards():
     "Best Sketch Actor",
     "Best Cover",
     "Worst Cover",
-    "Best Set Design",
+    "Best Set",
     "Best Lighting",
     "Best Sound",
     "Best Costumes",
