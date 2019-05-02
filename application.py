@@ -464,7 +464,7 @@ def initScheduler():
     vote = dict(
         func=assign_phase,
         args=[2],
-        run_date=parse("2019-05-02 12:00:00 PM EDT", tzinfos=tzinfos),
+        run_date=parse("2019-05-02 11:59:00 PM EDT", tzinfos=tzinfos),
         id='vote',
         name='Change phase to voting')
     static = dict(
