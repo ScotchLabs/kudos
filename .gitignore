@@ -2,8 +2,3 @@
 .DS_Store
 config_secrets.py
 data.db
-
-# Elastic Beanstalk Files
-.elasticbeanstalk
-.ebextensions
-.ebignore

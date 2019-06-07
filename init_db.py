@@ -11,6 +11,12 @@ def init_db():
 
     db.session.commit()
 
+def give_admin(username):
+    user = User.query.filter_by(username="gseastre").first()
+    if user is None:
+        raise KeyError("User '%s' does not exist" % (username,))
+    user.give_admin()
+
 def init_state():
     db.session.query(State).delete()
     db.session.add(State(phase=0))
@@ -67,7 +73,7 @@ def init_awards():
     "King and Queen of the Black Chairs Award",
     "Best Late Show Moment",
     "Nathaniel Biggs Coolest Uncle Award",
-    "Hottest Gossip",
+    "Nathan Blinn Best Black Chairs Argument",
     "New Kudos Category",
     "Retire a Kudos Category",
     ]
@@ -131,13 +137,20 @@ def init_many_noms():
 
     db.session.commit()
 
+def init_user_admin(username):
+    tmp = User.query.filter_by(username=username).first()
+    if tmp is not None:
+        raise ValueError("User already exists")
+    user = User(username=username, password="password",
+        email_confirmed=True, is_admin=True)
+    db.session.add(user)
+    db.session.commit()
+    return user
+
 def init_myself():
     user = User.query.filter_by(username="gseastre").first()
     if user is None:
-        user = User(username="gseastre", password="iamgroont",
-            email_confirmed=True, is_admin=True)
-        db.session.add(user)
-        db.session.commit()
+        user = init_user_admin("gseastre")
     return user
 
 def clear_votes():

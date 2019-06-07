@@ -6,10 +6,10 @@ except ImportError:
     key = email = password = None
 
 DEBUG = False
+SQLALCHEMY_TRACK_MODIFICATIONS = False
 SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "sqlite:///data.db")
 SECRET_KEY = os.getenv("SECRET_KEY", key)
 BCRYPT_LOG_ROUNDS = 12
-SQLALCHEMY_TRACK_MODIFICATIONS = False
 MAIL_SERVER = "smtp.gmail.com"
 MAIL_PORT = 465
 MAIL_USE_SSL = True

@@ -19,7 +19,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from dateutil.parser import parse
 from dateutil.tz import gettz
 
-application = app # name needed for eb
+application = app # alias used to be important but is kept for safe-keeping
 
 @app.route('/signup', methods=["GET", "POST"])
 def signup():
@@ -482,4 +482,4 @@ def initScheduler():
     atexit.register(lambda: scheduler.shutdown())
 
 if __name__ == "__main__":
-    app.run(debug=True) # should only be on debug when run locally, not on eb
+    app.run(debug=True) # should only be on debug when run locally
