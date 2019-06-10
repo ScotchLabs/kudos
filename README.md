@@ -41,6 +41,12 @@ heroku create sns-kudos
 When that completes, take note of the herokuapp url it gives you. This is where your application will be hosted (at least for now). Then, run
 
 ```
+python config_heroku.py
+```
+
+This set the environment variables from your `config_secrets.py` file on the heroku server. Then, run
+
+```
 git push heroku master
 ```
 
