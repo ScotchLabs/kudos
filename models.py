@@ -18,7 +18,8 @@ def default_email(context):
     return context.get_current_parameters()["username"] + "@andrew.cmu.edu"
 
 def default_password():
-    return bcrypt.generate_password_hash("password")
+    # decode string to avoid invalid salt error with postgres
+    return bcrypt.generate_password_hash("password").decode("utf-8")
 
 def default_token():
     return bcrypt.generate_password_hash(str(time.time()))
