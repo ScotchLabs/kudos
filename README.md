@@ -26,7 +26,7 @@ Additionally, you may also use whatever G Suite domain you have for Google Mail.
 
 # Local Testing
 
-Before deploying the application, you should test it locally to make sure everything works. First, clone this git repository to somewhere on your machine, install the requirements, run the `init_db` function from `init_db.py`, and then run `application.py`. Then open the url given in the console and try to create an account and submit some nominations. You can return to `init_db.py` and run the `give_admin` function on your username to make yourself an admin, and then explore the admin page which should now appear in the dropdown menu under your username on the site.
+Before deploying the application, you should test it locally to make sure everything works. First, clone this git repository to somewhere on your machine, install the requirements, create and fill `config_secrets.py`, run the `init_db` function from `init_db.py`, and then run `application.py`. Then open the url given in the console and try to create an account and submit some nominations. You can return to `init_db.py` and run the `give_admin` function on your username to make yourself an admin, and then explore the admin page which should now appear in the dropdown menu under your username on the site.
 
 # Heroku Setup
 
@@ -44,7 +44,7 @@ When that completes, take note of the herokuapp url it gives you. This is where 
 python config_heroku.py
 ```
 
-This set the environment variables from your `config_secrets.py` file on the heroku server. Then, run
+This sets the environment variables from your `config_secrets.py` file on the heroku server. Then, run
 
 ```
 git push heroku master
@@ -56,7 +56,7 @@ This will deploy the application. Once that completes, you need to initialize th
 heroku run python
 ```
 
-When the python console opens, run the following command:
+When the python console opens, run the following commands:
 
 ```python
 >>> from init_db import init_db
