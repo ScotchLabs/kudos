@@ -38,6 +38,12 @@ To get started, set up a Heroku account and download the [Heroku CLI](https://de
 heroku create sns-kudos
 ```
 
+Then add a database to the application:
+
+```
+heroku addons:create heroku-postgresql:hobby-dev
+```
+
 When that completes, take note of the herokuapp url it gives you. This is where your application will be hosted (at least for now). Then, run
 
 ```
