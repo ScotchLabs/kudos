@@ -19,8 +19,6 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from dateutil.parser import parse
 from dateutil.tz import gettz
 
-application = app # alias used to be important but is kept for safe-keeping
-
 @app.route('/signup', methods=["GET", "POST"])
 def signup():
     if current_user.is_authenticated:
