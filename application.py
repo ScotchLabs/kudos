@@ -58,7 +58,6 @@ def confirm_email(token):
 
     user.email_confirmed = True
 
-    db.session.add(user)
     db.session.commit()
 
     flash("Email confirmed! Sign in!", "success")
@@ -163,7 +162,6 @@ def reset_with_token(token):
 
         user.password = form.password.data
 
-        db.session.add(user)
         db.session.commit()
 
         flash("Password reset successfully! Sign in!", "success")
@@ -179,7 +177,6 @@ def change_password():
     if form.validate_on_submit():
         if current_user.is_correct_password(form.currentpass.data):
             current_user.password = form.password.data
-            db.session.add(current_user)
             db.session.commit()
             login_user(current_user, remember=True)
             flash("Password changed!", "success")
@@ -209,7 +206,6 @@ def awards():
         else:
             award.nominations.append(Nomination(name=form.entry.data,
                                                 creator=current_user))
-            db.session.add(award)
             db.session.commit()
             flash("Nomination successful!", "success")
         return redirect(url_for("awards") + "#" + str(award.id))
@@ -389,7 +385,6 @@ class MyAdminIndexView(AdminIndexView):
             s.dtvote = dt
         else:
             s.dtstatic = dt
-        db.session.add(s)
         db.session.commit()
 
     def ban(self, bform):
@@ -411,24 +406,20 @@ class MyAdminIndexView(AdminIndexView):
                 html = render_template('email/unban.html')
                 send_email(user.email, subject, html)
                 msg += "and notified "
-        db.session.add(user)
         db.session.commit()
         flash(msg + user.username, "success") # flash once commit passes
 
     def change_admin(self, aform):
         user = User.query.filter_by(
             username=aform.adminuser.data.lower()).first_or_404()
-        msg = None
         if aform.give.data:
             user.give_admin()
-            msg = ("Made %s an admin" % user.username, "success")
+            msg = "Made %s an admin" % user.username
         elif aform.take.data:
             user.take_admin()
-            msg = ("Removed %s as admin" % user.username, "success")
-        db.session.add(user)
+            msg = "Removed %s as admin" % user.username
         db.session.commit()
-        if msg is not None:
-            flash(*msg) # don't flash until commit passes
+        flash(msg, "success") # flash once commit passes
 
     def remove_nom(self, nomid, warn, ban):
         nom = Nomination.query.filter_by(id=nomid).first_or_404()
@@ -446,7 +437,6 @@ class MyAdminIndexView(AdminIndexView):
             flash("Warning sent to %s" % user.username, "success")
         elif ban:
             user.ban()
-            db.session.add(user)
             db.session.commit() # don't send email until commit passes
             subject = "Your account has been banned"
             html = render_template('email/ban.html')
@@ -524,7 +514,6 @@ def list_awards():
 def assign_phase(p):
     s = State.query.first()
     s.phase = p
-    db.session.add(s)
     db.session.commit()
 
 pndict = dict(

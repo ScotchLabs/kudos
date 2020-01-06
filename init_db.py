@@ -29,7 +29,6 @@ def init_schedule():
     s.dtnom = parse("2020-04-29 10:00:00 AM")
     s.dtvote = parse("2020-05-04 11:59:00 PM")
     s.dtstatic = parse("2020-05-04 11:59:00 PM")
-    db.session.add(s)
     db.session.commit()
 
 def init_awards():
