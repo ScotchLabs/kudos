@@ -1,6 +1,6 @@
 import itsdangerous, json, atexit
 
-from flask import redirect, render_template, url_for, send_file, abort, \
+from flask import redirect, render_template, url_for, abort, \
     flash, request
 from flask_login import login_user, logout_user, current_user, login_required
 from flask_mail import Message
@@ -9,15 +9,17 @@ from flask_admin.contrib.sqla import ModelView
 
 from app_manager import app, db, ts, mail
 from forms import SignupForm, LoginForm, UsernameForm, ResetPasswordForm, \
-    ChangePasswordForm, NominationForm, BanForm, AdminForm, NomIDForm
+    ChangePasswordForm, NominationForm, BanForm, AdminForm, NomIDForm, \
+    PhaseNomForm, PhaseVoteForm, PhaseStaticForm
 from models import User, Award, Nomination, State
 from login_manager import login_manager
 
 from werkzeug.exceptions import default_exceptions
 from urllib.parse import urlparse, urljoin
 from apscheduler.schedulers.background import BackgroundScheduler
-from dateutil.parser import parse
-from dateutil.tz import gettz
+from apscheduler.jobstores.base import JobLookupError
+
+scheduler = BackgroundScheduler(timezone="US/Eastern")
 
 @app.route('/signup', methods=["GET", "POST"])
 def signup():
@@ -273,9 +275,25 @@ class MyAdminIndexView(AdminIndexView):
 
     @expose("/", methods=["GET", "POST"])
     def index(self):
+        pnform = PhaseNomForm()
+        pvform = PhaseVoteForm()
+        psform = PhaseStaticForm()
         bform = BanForm()
         aform = AdminForm()
         nform = NomIDForm()
+
+        if ((pnform.pnon.data and pnform.validate_on_submit()) or
+                pnform.pnoff.data):
+            self.phase_sched(pnform, 1)
+            return self.check_full_index()
+        if ((pvform.pvon.data and pvform.validate_on_submit()) or
+                pvform.pvoff.data):
+            self.phase_sched(pvform, 2)
+            return self.check_full_index()
+        if ((psform.pson.data and psform.validate_on_submit()) or
+                psform.psoff.data):
+            self.phase_sched(psform, 0)
+            return self.check_full_index()
         if (bform.ban.data or bform.unban.data) and bform.validate_on_submit():
             self.ban(bform)
             return self.check_full_index()
@@ -286,9 +304,19 @@ class MyAdminIndexView(AdminIndexView):
                 nform.validate_on_submit()):
             self.remove_nom(nform.nomid.data, nform.rwarn.data, nform.rban.data)
             return self.check_full_index()
+
         full = self.get_full()
-        return self.render("admin/index.html", bform=bform, aform=aform,
-            nform=nform, awards=list_awards(), full=full, phase=phase())
+        s = State.query.first()
+        if s.dtnom is not None:
+            pnform.dtnom.data = s.dtnom
+        if s.dtvote is not None:
+            pvform.dtvote.data = s.dtvote
+        if s.dtstatic is not None:
+            psform.dtstatic.data = s.dtstatic
+
+        return self.render("admin/index.html", pnform=pnform, pvform=pvform,
+            psform=psform, aform=aform, bform=bform, nform=nform,
+            awards=list_awards(), full=full, phase=phase())
 
     @expose("/user_list", methods=["GET"])
     def list_users(self):
@@ -323,20 +351,69 @@ class MyAdminIndexView(AdminIndexView):
                   "success")
         return self.check_full_index()
 
+    def phase_sched(self, form, p):
+        if p == 1:
+            kwds = pndict
+            cancel = form.pnoff.data
+            dt = form.dtnom.data
+            pname = "Nominating"
+        elif p == 2:
+            kwds = pvdict
+            cancel = form.pvoff.data
+            dt = form.dtvote.data
+            pname = "Voting"
+        else:
+            kwds = psdict
+            cancel = form.psoff.data
+            dt = form.dtstatic.data
+            pname = "Static"
+
+        if cancel:
+            try:
+                scheduler.remove_job(kwds["id"])
+                flash("Canceled %s Phase" % pname, "success")
+            except JobLookupError:
+                flash("%s Phase schedule not found or "
+                      "already passed" % pname, "warning")
+            dt = None
+        else:
+            scheduler.add_job(replace_existing=True,
+                run_date=dt, **kwds)
+            flash("Scheduled %s Phase for %s" %
+                (pname, dt.strftime("%A %B %d %Y at %I:%M %p")), "success")
+
+        s = State.query.first()
+        if p == 1:
+            s.dtnom = dt
+        elif p == 2:
+            s.dtvote = dt
+        else:
+            s.dtstatic = dt
+        db.session.add(s)
+        db.session.commit()
+
     def ban(self, bform):
         user = User.query.filter_by(
             username=bform.banuser.data.lower()).first_or_404()
-        msg = None
         if bform.ban.data:
             user.ban()
-            msg = ("Banned %s" % user.username, "success")
+            msg = "Banned "
+            if bform.email.data:
+                subject = "Your account has been banned"
+                html = render_template('email/ban.html')
+                send_email(user.email, subject, html)
+                msg += "and notified "
         elif bform.unban.data:
             user.unban()
-            msg = ("Unbanned %s" % user.username, "success")
+            msg = "Unbanned "
+            if bform.email.data:
+                subject = "Your account is no longer banned"
+                html = render_template('email/unban.html')
+                send_email(user.email, subject, html)
+                msg += "and notified "
         db.session.add(user)
         db.session.commit()
-        if msg is not None:
-            flash(*msg) # don't flash until commit passes
+        flash(msg + user.username, "success") # flash once commit passes
 
     def change_admin(self, aform):
         user = User.query.filter_by(
@@ -445,37 +522,37 @@ def list_awards():
     return Award.query.order_by(Award.order).all()
 
 def assign_phase(p):
-    obj = State.query.first()
-    obj.phase = p
-    db.session.add(obj)
+    s = State.query.first()
+    s.phase = p
+    db.session.add(s)
     db.session.commit()
+
+pndict = dict(
+    func=assign_phase,
+    args=[1],
+    id='nom',
+    name='Change phase to nominating')
+pvdict = dict(
+    func=assign_phase,
+    args=[2],
+    id='vote',
+    name='Change phase to voting')
+psdict = dict(
+    func=assign_phase,
+    args=[0],
+    id='static',
+    name='Change phase to static')
 
 @app.before_first_request
 def initScheduler():
-    tzinfos = {"EDT": gettz("US/Eastern")}
-    nom = dict(
-        func=assign_phase,
-        args=[1],
-        run_date=parse("2019-04-29 10:00:00 AM EDT", tzinfos=tzinfos),
-        id='nom',
-        name='Change phase to nominating')
-    vote = dict(
-        func=assign_phase,
-        args=[2],
-        run_date=parse("2019-05-02 11:59:00 PM EDT", tzinfos=tzinfos),
-        id='vote',
-        name='Change phase to voting')
-    static = dict(
-        func=assign_phase,
-        args=[0],
-        run_date=parse("2019-05-04 11:59:00 PM EDT", tzinfos=tzinfos),
-        id='static',
-        name='Change phase to static')
-
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(**nom)
-    scheduler.add_job(**vote)
-    scheduler.add_job(**static)
+    # this implementation assumes there is only one dyno on heroku
+    s = State.query.first()
+    if s.dtnom is not None:
+        scheduler.add_job(run_date=s.dtnom, **pndict)
+    if s.dtvote is not None:
+        scheduler.add_job(run_date=s.dtvote, **pvdict)
+    if s.dtstatic is not None:
+        scheduler.add_job(run_date=s.dtstatic, **psdict)
     scheduler.start()
     atexit.register(lambda: scheduler.shutdown())
 

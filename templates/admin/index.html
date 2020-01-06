@@ -20,20 +20,58 @@
 
 <br><br>
 
-<form method="POST" action="{{ url_for('admin.index') }}{{ '?full' if full }}">
-    {{ bform.csrf_token }}
-    {{ bform.banuser(placeholder=bform.banuser.label.text) }}<br>
-    {{ bform.ban }} {{ bform.unban }}
-    {{ render_errors(bform.banuser) }}
-</form>
-<br>
-<form method="POST" action="{{ url_for('admin.index') }}{{ '?full' if full }}">
-    {{ aform.csrf_token }}
-    {{ aform.adminuser(placeholder=aform.adminuser.label.text) }}<br>
-    {{ aform.give }} {{ aform.take }}
-    {{ render_errors(aform.adminuser) }}
-</form>
-<br>
+<div class="row">
+    <div class="col-sm-4 col-lg-3">
+        <form method="POST" action="{{ url_for('admin.index') }}{{ '?full' if full }}">
+            {{ pnform.csrf_token }}
+            {{ pnform.dtnom(placeholder=pnform.dtnom.label.text) }}<br>
+            {{ pnform.pnon }} {{ pnform.pnoff }}
+            {{ render_errors(pnform.dtnom) }}
+        </form>
+        <br>
+    </div>
+    <div class="col-sm-4 col-lg-3">
+        <form method="POST" action="{{ url_for('admin.index') }}{{ '?full' if full }}">
+            {{ pvform.csrf_token }}
+            {{ pvform.dtvote(placeholder=pvform.dtvote.label.text) }}<br>
+            {{ pvform.pvon }} {{ pvform.pvoff }}
+            {{ render_errors(pvform.dtvote) }}
+        </form>
+        <br>
+    </div>
+    <div class="col-sm-4 col-lg-3">
+        <form method="POST" action="{{ url_for('admin.index') }}{{ '?full' if full }}">
+            {{ psform.csrf_token }}
+            {{ psform.dtstatic(placeholder=psform.dtstatic.label.text) }}<br>
+            {{ psform.pson }} {{ psform.psoff }}
+            {{ render_errors(psform.dtstatic) }}
+        </form>
+        <br>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-4 col-lg-3">
+        <form method="POST" action="{{ url_for('admin.index') }}{{ '?full' if full }}">
+            {{ aform.csrf_token }}
+            {{ aform.adminuser(placeholder=aform.adminuser.label.text) }}<br>
+            {{ aform.give }} {{ aform.take }}
+            {{ render_errors(aform.adminuser) }}
+        </form>
+        <br>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <form method="POST" action="{{ url_for('admin.index') }}{{ '?full' if full }}">
+            {{ bform.csrf_token }}
+            {{ bform.banuser(placeholder=bform.banuser.label.text) }}
+            {{ bform.email }} {{ bform.email.label }}<br>
+            {{ bform.ban }} {{ bform.unban }}
+            {{ render_errors(bform.banuser) }}
+        </form>
+        <br>
+    </div>
+</div>
+
 <form method="POST" action="{{ url_for('admin.index') }}{{ '?full' if full }}">
     {{ nform.csrf_token }}
     {{ nform.nomid(placeholder=nform.nomid.label.text) }}<br>

@@ -1,6 +1,8 @@
-from app_manager import db
-from models import User, Award, Nomination, State
 import os, random
+from app_manager import db
+from application import pndict, pvdict, psdict
+from models import User, Award, Nomination, State
+from dateutil.parser import parse
 
 def init_db():
     db.drop_all()
@@ -12,7 +14,7 @@ def init_db():
     db.session.commit()
 
 def give_admin(username):
-    user = User.query.filter_by(username="gseastre").first()
+    user = User.query.filter_by(username=username).first()
     if user is None:
         raise KeyError("User '%s' does not exist" % (username,))
     user.give_admin()
@@ -20,6 +22,14 @@ def give_admin(username):
 def init_state():
     db.session.query(State).delete()
     db.session.add(State(phase=0))
+    db.session.commit()
+
+def init_schedule():
+    s = State.query.first()
+    s.dtnom = parse("2020-04-29 10:00:00 AM")
+    s.dtvote = parse("2020-05-04 11:59:00 PM")
+    s.dtstatic = parse("2020-05-04 11:59:00 PM")
+    db.session.add(s)
     db.session.commit()
 
 def init_awards():
@@ -89,13 +99,13 @@ def init_some_noms():
     awards = db.session.query(Award).all()
     assert(len(awards) >= 5)
 
-    awards[0].nominations.append(Nomination(name="Grant Seastream", creator=user))
+    awards[0].nominations.append(Nomination(name="Braxton Brax", creator=user))
     awards[0].nominations.append(Nomination(name="It's me", creator=user))
     awards[0].nominations.append(Nomination(name="Jared", creator=user))
-    awards[1].nominations.append(Nomination(name="Grant Again", creator=user))
+    awards[1].nominations.append(Nomination(name="Braxton Again", creator=user))
     awards[1].nominations.append(Nomination(name="It's me", creator=user))
     awards[2].nominations.append(Nomination(name="Stephen Colbert", creator=user))
-    awards[3].nominations.append(Nomination(name="My butt", creator=user))
+    awards[3].nominations.append(Nomination(name="My neck", creator=user))
     awards[4].nominations.append(Nomination(name="Hey there!", creator=user))
     awards[4].nominations.append(Nomination(name="American Vandal", creator=user))
     awards[4].nominations.append(Nomination(name="Alex Trimboli", creator=user))
@@ -107,7 +117,7 @@ def init_many_noms():
     user = init_myself()
 
     choices = [
-    "Grant Seastream",
+    "Braxton Brax",
     "Stephen Colbert",
     "American Vandal",
     "Alex Trimboli",

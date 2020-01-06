@@ -109,6 +109,9 @@ class State(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # 0 is static, 1 is nominations, 2 is voting
     phase = db.Column(db.Integer, nullable=False)
+    dtnom = db.Column(db.DateTime)
+    dtvote = db.Column(db.DateTime)
+    dtstatic = db.Column(db.DateTime)
 
     def __repr__(self):
         return '<State %r>' % self.id

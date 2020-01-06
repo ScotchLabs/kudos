@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, HiddenField, SubmitField
-from wtforms.validators import DataRequired, Email, Length, ValidationError
+from wtforms import StringField, PasswordField, HiddenField, SubmitField, \
+    DateTimeField, BooleanField
+from wtforms.validators import DataRequired, Length, ValidationError
 from app_manager import db
 from models import User, Nomination
 
@@ -33,6 +34,8 @@ def check_admin(form, field):
         raise ValidationError("User is not admin")
 
 def check_nom(form, field):
+    # IntegerField just ignores invalid input instead of letting the
+    # user know that they need to enter an integer
     nomid = integer(form, field)
     nom = Nomination.query.filter_by(id=nomid).first()
     if nom is None:
@@ -60,6 +63,7 @@ class UsernameForm(FlaskForm):
 
 class BanForm(FlaskForm):
     banuser = StringField('Username', validators=[DataRequired(), check_ban])
+    email = BooleanField("Email")
     ban = SubmitField('Ban User')
     unban = SubmitField('Unban User')
 
@@ -87,3 +91,21 @@ class ChangePasswordForm(FlaskForm):
 class NominationForm(FlaskForm):
     entry = StringField('Nomination')
     award_id = HiddenField('Award ID')
+
+class PhaseNomForm(FlaskForm):
+    dtnom = DateTimeField("e.g. 1/1/2020 12:00 PM",
+        format="%m/%d/%Y %I:%M %p")
+    pnon = SubmitField("Schedule Nominating Phase")
+    pnoff = SubmitField("Cancel")
+
+class PhaseVoteForm(FlaskForm):
+    dtvote = DateTimeField("e.g. 1/1/2020 12:00 PM",
+        format="%m/%d/%Y %I:%M %p")
+    pvon = SubmitField("Schedule Voting Phase")
+    pvoff = SubmitField("Cancel")
+
+class PhaseStaticForm(FlaskForm):
+    dtstatic = DateTimeField("e.g. 1/1/2020 12:00 PM",
+        format="%m/%d/%Y %I:%M %p")
+    pson = SubmitField("Schedule Static Phase")
+    psoff = SubmitField("Cancel")
