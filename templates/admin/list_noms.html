@@ -3,7 +3,7 @@
 {% block body %}
 
 <h2>{{ award.name }}</h2>
-{% for nom in award.nominations %}
+{% for nom in award.nominations|sort(attribute="id") %}
     <div name="nom"><b>{{ nom.votes }} votes</b> | <span>{{ nom.name }}</span> | <span>{{ nom.creator.username }}</span> | ID={{ nom.id }} | <a name="rem" href="{{ url_for('admin.remove', awd=award.id, nom=nom.id) }}">Remove</a> | <a name="warn" href="{{ url_for('admin.remove', awd=award.id, nom=nom.id, warn=nom.creator.id) }}">Remove and Warn</a> | <a name="ban" href="{{ url_for('admin.remove', awd=award.id, nom=nom.id, ban=nom.creator.id) }}">Remove, Ban, & Notify</a>
     <br></div>
 {% endfor %}
@@ -32,5 +32,7 @@
         }
     }
 </script>
+
+<br><br><br>
 
 {% endblock body %}

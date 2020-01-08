@@ -117,7 +117,7 @@
 {% for award in awards %}
     {% if full %}
         <h2>{{ award.name }}</h2>
-        {% for nom in award.nominations %}
+        {% for nom in award.nominations|sort(attribute="id") %}
             <b>{{ nom.votes }} votes</b> | {{ nom.name }} | {{ nom.creator.username }} | ID={{ nom.id }}
             <br>
         {% endfor %}
@@ -125,5 +125,7 @@
         <h2><a href="{{ url_for('admin.list_noms', awd=award.id) }}">{{ award.name }}</a></h2>
     {% endif %}
 {% endfor %}
+
+<br><br><br>
 
 {% endblock body %}

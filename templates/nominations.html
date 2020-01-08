@@ -27,7 +27,7 @@
             {% for award in awards %}
                 <h2 id="{{ award.id }}" class="target"><b style="color: #d77a3d">{{ award.name }}</b></h2>
                 <ul>
-                    {% for nom in award.nominations %}
+                    {% for nom in award.nominations|sort(attribute="id") %}
                         <li style="font-size: 120%">{{ nom.name }}</li>
                     {% endfor %}
                 </ul>

@@ -14,7 +14,7 @@
             {% for award in awards %}
                 <h2 id="{{ award.id }}" class="target"><b style="color: #d77a3d">{{ award.name }}</b></h2>
                 <ul class="actions">
-                    {% for nom in award.nominations %}
+                    {% for nom in award.nominations|sort(attribute="id") %}
                         {% if nom in current_user.selections %}
                             {% set bcolor = "lightgreen" %}
                         {% else %}
