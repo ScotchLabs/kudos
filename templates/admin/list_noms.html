@@ -4,8 +4,33 @@
 
 <h2>{{ award.name }}</h2>
 {% for nom in award.nominations %}
-    <b>{{ nom.votes }} votes</b> | {{ nom.name }} | {{ nom.creator.username }} | ID={{ nom.id }} | <a href="{{ url_for('admin.remove', awd=award.id, nom=nom.id) }}">Remove</a> | <a href="{{ url_for('admin.remove', awd=award.id, nom=nom.id, warn=nom.creator.id) }}">Remove and Warn</a> | <a href="{{ url_for('admin.remove', awd=award.id, nom=nom.id, ban=nom.creator.id) }}">Remove, Ban, & Notify</a>
-    <br>
+    <div name="nom"><b>{{ nom.votes }} votes</b> | <span>{{ nom.name }}</span> | <span>{{ nom.creator.username }}</span> | ID={{ nom.id }} | <a name="rem" href="{{ url_for('admin.remove', awd=award.id, nom=nom.id) }}">Remove</a> | <a name="warn" href="{{ url_for('admin.remove', awd=award.id, nom=nom.id, warn=nom.creator.id) }}">Remove and Warn</a> | <a name="ban" href="{{ url_for('admin.remove', awd=award.id, nom=nom.id, ban=nom.creator.id) }}">Remove, Ban, & Notify</a>
+    <br></div>
 {% endfor %}
+
+<script>
+    // Ask for confirmation for sensitive actions
+    function onclickHandler() {
+        spans = this.parentElement.getElementsByTagName("span")
+        var nom = spans[0].textContent;
+        var user = spans[1].textContent;
+        var msg = `Are you sure you want to remove '${nom}'`;
+        var r = this.name == "rem";
+        if (!r) {
+            var w = this.name == "warn";
+            var b = this.name == "ban";
+            msg += ` and ${w ? "warn" : b ? "ban/notify" : ""} ${user}`
+        }
+        return confirm(msg + "?");
+    }
+
+    var noms = document.getElementsByName("nom");
+    for (var i = 0; i < noms.length; i++) {
+        var btns = noms[i].getElementsByTagName("a");
+        for (var j = 0; j < btns.length; j++) {
+            btns[j].onclick = onclickHandler;
+        }
+    }
+</script>
 
 {% endblock body %}

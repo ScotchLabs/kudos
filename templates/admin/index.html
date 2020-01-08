@@ -61,7 +61,7 @@
         <br>
     </div>
     <div class="col-sm-6 col-lg-3">
-        <form method="POST" action="{{ url_for('admin.index') }}{{ '?full' if full }}">
+        <form name="bform" method="POST" action="{{ url_for('admin.index') }}{{ '?full' if full }}">
             {{ bform.csrf_token }}
             {{ bform.banuser(placeholder=bform.banuser.label.text) }}
             {{ bform.email }} {{ bform.email.label }}<br>
@@ -72,12 +72,46 @@
     </div>
 </div>
 
-<form method="POST" action="{{ url_for('admin.index') }}{{ '?full' if full }}">
+<form name="nform" method="POST" action="{{ url_for('admin.index') }}{{ '?full' if full }}">
     {{ nform.csrf_token }}
     {{ nform.nomid(placeholder=nform.nomid.label.text) }}<br>
     {{ nform.rem }} {{ nform.rwarn }} {{ nform.rban }}
     {{ render_errors(nform.nomid) }}
 </form>
+
+<script>
+    // Ask for confirmation for sensitive actions
+    function onclickHandler() {
+        this.form.submitName = this.name;
+    }
+
+    function banHandler() {
+        if (this.email.checked) {
+            var b = this.submitName == this.ban.name;
+            return confirm(`Are you sure you want to ${b ? "ban" : "unban"} and email ${this.banuser.value}?`);
+        };
+    }
+
+    function remHandler() {
+        var msg = `Are you sure you want to remove Nomination ${this.nomid.value}`;
+        var r = this.submitName == this.rem.name;
+        if (!r) {
+            var w = this.submitName == this.rwarn.name;
+            var b = this.submitName == this.rban.name;
+            msg += ` and ${w ? "warn" : b ? "ban/notify" : ""} the user`
+        }
+        return confirm(msg + "?");
+    }
+
+    document.bform.ban.onclick = onclickHandler;
+    document.bform.unban.onclick = onclickHandler;
+    document.bform.onsubmit = banHandler;
+
+    document.nform.rem.onclick = onclickHandler;
+    document.nform.rwarn.onclick = onclickHandler;
+    document.nform.rban.onclick = onclickHandler;
+    document.nform.onsubmit = remHandler;
+</script>
 
 <h1>Nominations</h1>
 {% for award in awards %}
