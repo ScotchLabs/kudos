@@ -26,7 +26,7 @@ Additionally, you may also use whatever G Suite domain you have for Google Mail.
 
 # Local Testing
 
-Before deploying the application, you should test it locally to make sure everything works. First, clone this git repository to somewhere on your machine, install the requirements, create and fill `config_secrets.py`, run the `init_db` function from `init_db.py`, and then run `application.py`. Then open the url given in the console and try to create an account and submit some nominations. You can return to `init_db.py` and run the `give_admin` function on your username to make yourself an admin, and then explore the admin page which should now appear in the dropdown menu under your username on the site.
+Before deploying the application, you should test it locally to make sure everything works. First, clone this git repository to somewhere on your machine, install the requirements, create and fill `config_secrets.py`, run the `init_db` function from `dbutils.py`, and then run `application.py`. Then open the url given in the console and try to create an account and submit some nominations. You can return to `dbutils.py` and run the `give_admin` function on your username to make yourself an admin, and then explore the admin page which should now appear in the dropdown menu under your username on the site.
 
 # Heroku Setup
 
@@ -65,7 +65,7 @@ heroku run python
 When the python console opens, run the following commands:
 
 ```python
->>> from init_db import init_db
+>>> from dbutils import init_db
 >>> init_db()
 >>> quit()
 ```
@@ -73,7 +73,7 @@ When the python console opens, run the following commands:
 Then, head over to the herokuapp url mentioned above, and make sure everything works fine. Like before, test creating an account and submitting nominations. Sometimes there are security issues with sending emails once the app has been deployed, so make sure email sending functions work (like when you create an account), and fix any problems if they arise. Then, like before, make yourself an admin by running
 
 ```python
->>> from init_db import give_admin
+>>> from dbutils import give_admin
 >>> give_admin("yourusername")
 >>> quit()
 ```

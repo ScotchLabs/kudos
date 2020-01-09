@@ -1,6 +1,5 @@
 import os, random
 from app_manager import db
-from application import pndict, pvdict, psdict
 from models import User, Award, Nomination, State
 from dateutil.parser import parse
 
@@ -11,24 +10,6 @@ def init_db():
     init_awards()
     init_state()
 
-    db.session.commit()
-
-def give_admin(username):
-    user = User.query.filter_by(username=username).first()
-    if user is None:
-        raise KeyError("User '%s' does not exist" % (username,))
-    user.give_admin()
-
-def init_state():
-    db.session.query(State).delete()
-    db.session.add(State(phase=0))
-    db.session.commit()
-
-def init_schedule():
-    s = State.query.first()
-    s.dtnom = parse("2020-04-29 10:00:00 AM")
-    s.dtvote = parse("2020-05-04 11:59:00 PM")
-    s.dtstatic = parse("2020-05-04 11:59:00 PM")
     db.session.commit()
 
 def init_awards():
@@ -90,6 +71,18 @@ def init_awards():
     for i in range(len(award_order)):
         db.session.add(Award(name=award_order[i], order=(i + 1) * 10))
 
+    db.session.commit()
+
+def init_state():
+    db.session.query(State).delete()
+    db.session.add(State(phase=0))
+    db.session.commit()
+
+def init_schedule():
+    s = State.query.first()
+    s.dtnom = parse("2020-04-29 10:00:00 AM")
+    s.dtvote = parse("2020-05-04 11:59:00 PM")
+    s.dtstatic = parse("2020-05-04 11:59:00 PM")
     db.session.commit()
 
 def init_some_noms():
@@ -162,10 +155,11 @@ def init_myself():
         user = init_user_admin("gseastre")
     return user
 
-def clear_votes():
-    for user in User.query.all():
-        if len(user.selections) > 0:
-            user.selections = []
+def give_admin(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        raise KeyError("User '%s' does not exist" % (username,))
+    user.give_admin()
     db.session.commit()
 
 def delete_award(award):
@@ -173,6 +167,15 @@ def delete_award(award):
     for nom in award.nominations:
         db.session.delete(nom)
     db.session.delete(award)
+    db.session.commit()
+
+def clear_noms():
+    Nomination.query.delete()
+    db.session.commit()
+
+def clear_votes():
+    for user in User.query.all():
+        user.selections.clear()
     db.session.commit()
 
 def remove_local_db():

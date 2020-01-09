@@ -13,6 +13,7 @@ from forms import SignupForm, LoginForm, UsernameForm, ResetPasswordForm, \
     PhaseNomForm, PhaseVoteForm, PhaseStaticForm
 from models import User, Award, Nomination, State
 from login_manager import login_manager
+from dbutils import clear_noms, clear_votes
 
 from werkzeug.exceptions import default_exceptions
 from urllib.parse import urlparse, urljoin
@@ -35,8 +36,8 @@ def signup():
         # Now we'll send the email confirmation link
         send_confirm_link(user.email)
 
-        flash("Account created! Please click the confirmation link sent to "
-              "your email", "success")
+        flash("Account created! Please click the confirmation link sent to %s"
+              % user.email, "success")
 
         return redirect(url_for('index'))
 
@@ -105,7 +106,7 @@ def signin():
             flash("Logged in successfully", "success")
             next_url = request.args.get('next')
             if not is_safe_url(next_url):
-                return abort(400)
+                abort(400)
             return redirect(next_url or url_for('index'))
         else:
             flash("Password incorrect, try again", "error")
@@ -340,12 +341,28 @@ class MyAdminIndexView(AdminIndexView):
     def set_phase(self):
         p = request.args.get('phase', type=int)
         if p is not None:
-            if not p in (0,1,2):
-                abort(404)
-            assign_phase(p)
-            flash("Phase changed to %s" % ("static", "nominating", "voting")[p],
-                  "success")
-        return self.check_full_index()
+            if p in (0, 1, 2):
+                assign_phase(p)
+                flash("Phase changed to %s" %
+                    ("static", "nominating", "voting")[p], "success")
+                return self.check_full_index()
+        abort(400)
+
+    @expose("/clear", methods=["GET"])
+    def clear(self):
+        # protect action by requiring specific url arg
+        c = request.args.get('confirm')
+        if c == "yes":
+            s = request.args.get('select')
+            if s in ("noms", "votes"):
+                if s == "noms":
+                    clear_noms()
+                    flash("Cleared all nominations", "success")
+                else:
+                    clear_votes()
+                    flash("Cleared all votes", "success")
+                return self.check_full_index()
+        abort(400)
 
     def phase_sched(self, form, p):
         if p == 1:
@@ -395,7 +412,7 @@ class MyAdminIndexView(AdminIndexView):
             msg = "Banned "
             if bform.email.data:
                 subject = "Your account has been banned"
-                html = render_template('email/ban.html')
+                html = render_template('email/ban.html', award_name=None)
                 send_email(user.email, subject, html)
                 msg += "and notified "
         elif bform.unban.data:
@@ -439,7 +456,7 @@ class MyAdminIndexView(AdminIndexView):
             user.ban()
             db.session.commit() # don't send email until commit passes
             subject = "Your account has been banned"
-            html = render_template('email/ban.html')
+            html = render_template('email/ban.html', award_name=awd.name)
             send_email(user.email, subject, html)
             flash("Banned and notified %s" % user.username, "success")
 
