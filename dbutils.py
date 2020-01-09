@@ -1,4 +1,4 @@
-import os, random
+import os, random, argparse, sys, inspect
 from app_manager import db
 from models import User, Award, Nomination, State
 from dateutil.parser import parse
@@ -180,3 +180,22 @@ def clear_votes():
 
 def remove_local_db():
     os.remove("data.db")
+
+def main():
+    # collect list of all above functions as choices for argument
+    current_module = sys.modules[__name__]
+    fs = dict(inspect.getmembers(current_module, inspect.isfunction))
+    fs.pop("main") # don't let user execute main
+    parser = argparse.ArgumentParser(
+        description="Execute a selection of database utilities")
+    parser.add_argument("func", nargs='?', choices=fs, metavar="func",
+        help="Name of function to execute")
+    parser.add_argument('args', nargs=argparse.REMAINDER,
+        help="Arguments to pass to function")
+    args = parser.parse_args()
+
+    if args.func:
+        fs[args.func](*args.args)
+
+if __name__ == "__main__":
+    main()

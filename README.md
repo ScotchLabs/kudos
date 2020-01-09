@@ -28,6 +28,13 @@ Additionally, you may also use whatever G Suite domain you have for Google Mail.
 
 Before deploying the application, you should test it locally to make sure everything works. First, clone this git repository to somewhere on your machine, install the requirements, create and fill `config_secrets.py`, run the `init_db` function from `dbutils.py`, and then run `application.py`. Then open the url given in the console and try to create an account and submit some nominations. You can return to `dbutils.py` and run the `give_admin` function on your username to make yourself an admin, and then explore the admin page which should now appear in the dropdown menu under your username on the site.
 
+Note that you can run any of the functions in `dbutils.py` via the command line as illustrated below:
+
+```
+python dbutils.py init_db
+python dbutils.py give_admin username
+```
+
 # Heroku Setup
 
 This application is configured to run with Heroku, which handles deployment of the app. It lets you run limited applications for free, but the paid tier is [really cheap](https://www.heroku.com/pricing "really cheap") (especially if you're only running it for 2 weeks). The main benefit of the Hobby plan is getting a custom domain with SSL security (so it can be hosted at kudos.snstheatre.org, for example), and not having the app fall asleep after 30 minutes.
@@ -59,26 +66,16 @@ git push heroku master
 This will deploy the application. Once that completes, you need to initialize the database on the heroku server. To do that, run
 
 ```
-heroku run python
+heroku run python dbutils.py init_db
 ```
 
-When the python console opens, run the following commands:
+Then, head over to the herokuapp url mentioned above, and make sure everything works fine. Like before, test creating an account and submitting nominations. Sometimes there are security issues with sending emails once the app has been deployed, so make sure email sending functions work (like when you create an account or request a password reset), and fix any problems if they arise. Then, like before, make yourself an admin by running
 
-```python
->>> from dbutils import init_db
->>> init_db()
->>> quit()
+```
+heroku run python dbutils.py give_admin username
 ```
 
-Then, head over to the herokuapp url mentioned above, and make sure everything works fine. Like before, test creating an account and submitting nominations. Sometimes there are security issues with sending emails once the app has been deployed, so make sure email sending functions work (like when you create an account), and fix any problems if they arise. Then, like before, make yourself an admin by running
-
-```python
->>> from dbutils import give_admin
->>> give_admin("yourusername")
->>> quit()
-```
-
-Alternatively, you can make an admin account for yourself at the same time you initialize the database by importing and running `init_user_admin("username")`. The password of an account created this way will be "password" but this can be changed from the website.
+You can also use the function `init_user_admin(username)` from `dbutils.py` to make an admin account if you want to skip the setup process. The password of an account created this way will be "password" but this can be changed from the website. You will also find the same default password if you create a user from the admin interface.
 
 # Extra Heroku Stuff
 
