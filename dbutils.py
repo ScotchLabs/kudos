@@ -3,6 +3,8 @@ from app_manager import db
 from models import User, Award, Nomination, State
 from dateutil.parser import parse
 
+# any non-util functions should be removed from the choices in main
+
 def init_db():
     db.drop_all()
     db.create_all()
@@ -185,7 +187,8 @@ def main():
     # collect list of all above functions as choices for argument
     current_module = sys.modules[__name__]
     fs = dict(inspect.getmembers(current_module, inspect.isfunction))
-    fs.pop("main") # don't let user execute main
+    fs.pop("main") # remove non-util functions
+    fs.pop("parse")
     parser = argparse.ArgumentParser(
         description="Execute a selection of database utilities")
     parser.add_argument("func", nargs='?', choices=fs, metavar="func",
