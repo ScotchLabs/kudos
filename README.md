@@ -14,7 +14,7 @@ email = "yourusername@gmail.com"
 password = "yourpassword"
 ```
 
-To generate a secret key, it suffices to use the `secrets.token_urlsafe` function from python's [secrets](https://docs.python.org/3/library/secrets.html#secrets.token_urlsafe "secrets") library.
+To generate a secret key, it suffices to use the `secrets.token_urlsafe` function from python's [secrets](https://docs.python.org/3/library/secrets.html#secrets.token_urlsafe "secrets") library. The secret key is used to hash passwords, so keep it confidential.
 
 # Google Mail
 
