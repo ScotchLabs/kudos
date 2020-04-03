@@ -356,6 +356,7 @@ class MyAdminIndexView(AdminIndexView):
             s = request.args.get('select')
             if s in ("noms", "votes"):
                 if s == "noms":
+                    clear_votes() # must be done first
                     clear_noms()
                     flash("Cleared all nominations", "success")
                 else:
