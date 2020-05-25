@@ -127,7 +127,6 @@ def init_many_noms():
     "Why can't weeeee be friends, why can't weeeeeeeeeeeee be friends???",
     "Never gonna give you up",
     "Never gonna let you down",
-    "Can we like please rename the improv award I mean come on it's a team sport",
     "I hardly know her!",
     "Sweeney Todd",
     "Jimmy Fallon isn't funny",
