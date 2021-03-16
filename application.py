@@ -22,10 +22,10 @@ from apscheduler.jobstores.base import JobLookupError
 
 scheduler = BackgroundScheduler(timezone="US/Eastern")
 
-@app.route('/signup', methods=["GET", "POST"])
+@app.route("/signup", methods=["GET", "POST"])
 def signup():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for("index"))
     form = SignupForm()
     if form.validate_on_submit():
         user = User(username=form.username.data.lower(),
@@ -39,11 +39,11 @@ def signup():
         flash("Account created! Please click the confirmation link sent to %s"
               % user.email, "success")
 
-        return redirect(url_for('index'))
+        return redirect(url_for("index"))
 
-    return render_template('signup.html', form=form)
+    return render_template("signup.html", form=form)
 
-@app.route('/confirm/<token>', methods=["GET"])
+@app.route("/confirm/<token>", methods=["GET"])
 def confirm_email(token):
     try:
         email = ts.loads(token, salt="email-confirm-key", max_age=86400)
@@ -63,16 +63,16 @@ def confirm_email(token):
 
     flash("Email confirmed! Sign in!", "success")
 
-    return redirect(url_for('signin'))
+    return redirect(url_for("signin"))
 
 @app.route("/newlink/<token>", methods=["GET"])
 def new_link(token):
     email = ts.loads(token, salt="email-confirm-key") # ignore age here
     send_confirm_link(email)
     flash("New confirmation link sent, check your email!", "success")
-    return redirect(url_for('index'))
+    return redirect(url_for("index"))
 
-@app.route('/resend', methods=["GET", "POST"])
+@app.route("/resend", methods=["GET", "POST"])
 def resend():
     form = UsernameForm()
     if form.validate_on_submit():
@@ -83,13 +83,13 @@ def resend():
         else:
             send_confirm_link(user.email)
             flash("New confirmation link sent, check your email!", "success")
-            return redirect(url_for('index'))
-    return render_template('resend.html', form=form)
+            return redirect(url_for("index"))
+    return render_template("resend.html", form=form)
 
-@app.route('/signin', methods=["GET", "POST"])
+@app.route("/signin", methods=["GET", "POST"])
 def signin():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for("index"))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(
@@ -104,23 +104,23 @@ def signin():
                 return redirect(url_for("signin"))
             login_user(user, remember=True)
             flash("Logged in successfully", "success")
-            next_url = request.args.get('next')
+            next_url = request.args.get("next")
             if not is_safe_url(next_url):
                 abort(400)
-            return redirect(next_url or url_for('index'))
+            return redirect(next_url or url_for("index"))
         else:
             flash("Password incorrect, try again", "error")
-            return redirect(url_for('signin'))
-    return render_template('signin.html', form=form)
+            return redirect(url_for("signin"))
+    return render_template("signin.html", form=form)
 
-@app.route('/signout', methods=["GET"])
+@app.route("/signout", methods=["GET"])
 @login_required
 def signout():
     logout_user()
     flash("Logged out", "success")
-    return redirect(url_for('index'))
+    return redirect(url_for("index"))
 
-@app.route('/reset', methods=["GET", "POST"])
+@app.route("/reset", methods=["GET", "POST"])
 def reset():
     form = UsernameForm()
     if form.validate_on_submit():
@@ -129,25 +129,25 @@ def reset():
 
         subject = "Password reset requested"
 
-        token = ts.dumps(user.email, salt='recover-key')
+        token = ts.dumps(user.email, salt="recover-key")
 
         recover_url = url_for(
-            'reset_with_token',
+            "reset_with_token",
             token=token,
             _external=True)
 
         html = render_template(
-            'email/recover.html',
+            "email/recover.html",
             recover_url=recover_url)
 
         send_email(user.email, subject, html)
 
         flash("A password reset link has sent to your email address", "success")
 
-        return redirect(url_for('index'))
-    return render_template('reset.html', form=form)
+        return redirect(url_for("index"))
+    return render_template("reset.html", form=form)
 
-@app.route('/reset/<token>', methods=["GET", "POST"])
+@app.route("/reset/<token>", methods=["GET", "POST"])
 def reset_with_token(token):
     try:
         email = ts.loads(token, salt="recover-key", max_age=86400)
@@ -167,9 +167,9 @@ def reset_with_token(token):
 
         flash("Password reset successfully! Sign in!", "success")
 
-        return redirect(url_for('signin'))
+        return redirect(url_for("signin"))
 
-    return render_template('reset_with_token.html', form=form, token=token)
+    return render_template("reset_with_token.html", form=form, token=token)
 
 @app.route("/changepass", methods=["GET", "POST"])
 @login_required
@@ -181,11 +181,11 @@ def change_password():
             db.session.commit()
             login_user(current_user, remember=True)
             flash("Password changed!", "success")
-            return redirect(url_for('index'))
+            return redirect(url_for("index"))
         else:
             flash("Current password incorrect, try again", "error")
 
-    return render_template('change_password.html', form=form)
+    return render_template("change_password.html", form=form)
 
 @app.route("/awards", methods=["GET", "POST"])
 @login_required
@@ -210,7 +210,7 @@ def awards():
             db.session.commit()
             flash("Nomination successful!", "success")
         return redirect(url_for("awards") + "#" + str(award.id))
-    return render_template('nominations.html', form=form, awards=list_awards())
+    return render_template("nominations.html", form=form, awards=list_awards())
 
 @app.route("/submit_vote", methods=["POST"])
 @login_required
@@ -321,7 +321,7 @@ class MyAdminIndexView(AdminIndexView):
 
     @expose("/noms", methods=["GET"])
     def list_noms(self):
-        a = request.args.get('awd', type=int)
+        a = request.args.get("awd", type=int)
         award = Award.query.filter_by(id=a).first_or_404()
         return self.render("admin/list_noms.html", award=award)
 
@@ -329,17 +329,17 @@ class MyAdminIndexView(AdminIndexView):
     def remove(self):
         # url used by the nom list subpages to remove and such
         # it doesn't matter what actual argument is passed for warn or ban
-        a = request.args.get('awd', type=int)
-        n = request.args.get('nom', type=int)
-        w = request.args.get('warn')
-        b = request.args.get('ban')
+        a = request.args.get("awd", type=int)
+        n = request.args.get("nom", type=int)
+        w = request.args.get("warn")
+        b = request.args.get("ban")
         if n is not None:
             self.remove_nom(n, w is not None, b is not None)
         return redirect(url_for("admin.list_noms", awd=a))
 
     @expose("/setphase", methods=["GET"])
     def set_phase(self):
-        p = request.args.get('phase', type=int)
+        p = request.args.get("phase", type=int)
         if p is not None:
             if p in (0, 1, 2):
                 assign_phase(p)
@@ -351,9 +351,9 @@ class MyAdminIndexView(AdminIndexView):
     @expose("/clear", methods=["GET"])
     def clear(self):
         # protect action by requiring specific url arg
-        c = request.args.get('confirm')
+        c = request.args.get("confirm")
         if c == "yes":
-            s = request.args.get('select')
+            s = request.args.get("select")
             if s in ("noms", "votes"):
                 if s == "noms":
                     clear_votes() # must be done first
@@ -413,7 +413,7 @@ class MyAdminIndexView(AdminIndexView):
             msg = "Banned "
             if bform.email.data:
                 subject = "Your account has been banned"
-                html = render_template('email/ban.html', award_name=None)
+                html = render_template("email/ban.html", award_name=None)
                 send_email(user.email, subject, html)
                 msg += "and notified "
         elif bform.unban.data:
@@ -421,7 +421,7 @@ class MyAdminIndexView(AdminIndexView):
             msg = "Unbanned "
             if bform.email.data:
                 subject = "Your account is no longer banned"
-                html = render_template('email/unban.html')
+                html = render_template("email/unban.html")
                 send_email(user.email, subject, html)
                 msg += "and notified "
         db.session.commit()
@@ -450,14 +450,14 @@ class MyAdminIndexView(AdminIndexView):
               "success")
         if warn:
             subject = "Inappropriate Content Warning"
-            html = render_template('email/warning.html', award_name=awd.name)
+            html = render_template("email/warning.html", award_name=awd.name)
             send_email(user.email, subject, html)
             flash("Warning sent to %s" % user.username, "success")
         elif ban:
             user.ban()
             db.session.commit() # don't send email until commit passes
             subject = "Your account has been banned"
-            html = render_template('email/ban.html', award_name=awd.name)
+            html = render_template("email/ban.html", award_name=awd.name)
             send_email(user.email, subject, html)
             flash("Banned and notified %s" % user.username, "success")
 
@@ -469,7 +469,7 @@ class MyAdminIndexView(AdminIndexView):
             return redirect("/admin/")
 
     def get_full(self):
-        full = request.args.get('full')
+        full = request.args.get("full")
         # if full appears as anything in request, render the full page
         return full is not None
 
@@ -478,9 +478,9 @@ class MyModelView(ModelView):
     _handle_view = MyAdminIndexView._handle_view
 
 class UserView(MyModelView):
-    column_exclude_list = ['_password', "session_token"]
+    column_exclude_list = ["_password", "session_token"]
 
-admin = Admin(app, name='Kudos Admin', template_mode='bootstrap3',
+admin = Admin(app, name="Kudos Admin", template_mode="bootstrap3",
     index_view=MyAdminIndexView())
 admin.add_view(UserView(User, db.session))
 admin.add_view(MyModelView(Award, db.session))
@@ -500,15 +500,15 @@ for code in default_exceptions:
 def send_confirm_link(email):
     subject = "Confirm your email"
 
-    token = ts.dumps(email, salt='email-confirm-key')
+    token = ts.dumps(email, salt="email-confirm-key")
 
     confirm_url = url_for(
-        'confirm_email',
+        "confirm_email",
         token=token,
         _external=True)
 
     html = render_template(
-        'email/activate.html',
+        "email/activate.html",
         confirm_url=confirm_url)
 
     send_email(email, subject, html)
@@ -520,7 +520,7 @@ def send_email(email, subject, html):
 def is_safe_url(target):
     ref_url = urlparse(request.host_url)
     test_url = urlparse(urljoin(request.host_url, target))
-    return (test_url.scheme in ('http', 'https') and
+    return (test_url.scheme in ("http", "https") and
             ref_url.netloc == test_url.netloc)
 
 def phase():
@@ -537,18 +537,18 @@ def assign_phase(p):
 pndict = dict(
     func=assign_phase,
     args=[1],
-    id='nom',
-    name='Change phase to nominating')
+    id="nom",
+    name="Change phase to nominating")
 pvdict = dict(
     func=assign_phase,
     args=[2],
-    id='vote',
-    name='Change phase to voting')
+    id="vote",
+    name="Change phase to voting")
 psdict = dict(
     func=assign_phase,
     args=[0],
-    id='static',
-    name='Change phase to static')
+    id="static",
+    name="Change phase to static")
 
 @app.before_first_request
 def initScheduler():

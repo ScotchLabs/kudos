@@ -190,9 +190,9 @@ def main():
     fs.pop("parse")
     parser = argparse.ArgumentParser(
         description="Execute a selection of database utilities")
-    parser.add_argument("func", nargs='?', choices=fs, metavar="func",
+    parser.add_argument("func", nargs="?", choices=fs, metavar="func",
         help="Name of function to execute")
-    parser.add_argument('args', nargs=argparse.REMAINDER,
+    parser.add_argument("args", nargs=argparse.REMAINDER,
         help="Arguments to pass to function")
     args = parser.parse_args()
 

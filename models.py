@@ -3,10 +3,10 @@ from flask_login import UserMixin
 import time
 from app_manager import db, bcrypt
 
-users = db.Table('users',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'),
+users = db.Table("users",
+    db.Column("user_id", db.Integer, db.ForeignKey("user.id"),
               primary_key=True),
-    db.Column('nom_id', db.Integer, db.ForeignKey('nomination.id'),
+    db.Column("nom_id", db.Integer, db.ForeignKey("nomination.id"),
               primary_key=True)
 )
 
@@ -43,7 +43,7 @@ class User(db.Model, UserMixin):
     @password.setter
     def password(self, plaintext):
         self._password = \
-            bcrypt.generate_password_hash(plaintext).decode('utf-8')
+            bcrypt.generate_password_hash(plaintext).decode("utf-8")
         self.reset_token() # reset the token when you change the password
 
     def is_correct_password(self, plaintext):
@@ -78,7 +78,7 @@ class User(db.Model, UserMixin):
         return self.session_token
 
     def __repr__(self):
-        return '<User %r>' % self.username
+        return "<User %r>" % self.username
 
 class Award(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -87,14 +87,14 @@ class Award(db.Model):
     order = db.Column(db.Integer, nullable=False, default=1000)
 
     def __repr__(self):
-        return '<Award %r>' % self.name
+        return "<Award %r>" % self.name
 
 class Nomination(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
-    award_id = db.Column(db.Integer, db.ForeignKey('award.id'), nullable=False)
+    award_id = db.Column(db.Integer, db.ForeignKey("award.id"), nullable=False)
     creator = db.relationship("User", backref="entries")
-    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    creator_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     voters = db.relationship("User", secondary=users,
                              backref=db.backref("selections"))
 
@@ -103,7 +103,7 @@ class Nomination(db.Model):
         return len(self.voters)
 
     def __repr__(self):
-        return '<Nomination %r>' % self.id
+        return "<Nomination %r>" % self.id
 
 class State(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -114,4 +114,4 @@ class State(db.Model):
     dtstatic = db.Column(db.DateTime)
 
     def __repr__(self):
-        return '<State %r>' % self.id
+        return "<State %r>" % self.id

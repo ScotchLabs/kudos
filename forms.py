@@ -49,48 +49,48 @@ def integer(form, field):
     return i
 
 class SignupForm(FlaskForm):
-    username = StringField('Andrew ID',
+    username = StringField("Andrew ID",
         validators=[DataRequired(), Length(max=16), available])
-    password = PasswordField('Password',
+    password = PasswordField("Password",
         validators=[DataRequired(), Length(min=passmin, max=passmax)])
 
 class LoginForm(FlaskForm):
-    username = StringField('Andrew ID', validators=[DataRequired(), exists])
-    password = PasswordField('Password', validators=[DataRequired()])
+    username = StringField("Andrew ID", validators=[DataRequired(), exists])
+    password = PasswordField("Password", validators=[DataRequired()])
 
 class UsernameForm(FlaskForm):
-    username = StringField('Andrew ID', validators=[DataRequired(), exists])
+    username = StringField("Andrew ID", validators=[DataRequired(), exists])
 
 class BanForm(FlaskForm):
-    banuser = StringField('Username', validators=[DataRequired(), check_ban])
+    banuser = StringField("Username", validators=[DataRequired(), check_ban])
     email = BooleanField("Email")
-    ban = SubmitField('Ban User')
-    unban = SubmitField('Unban User')
+    ban = SubmitField("Ban User")
+    unban = SubmitField("Unban User")
 
 class AdminForm(FlaskForm):
-    adminuser = StringField('Username',
+    adminuser = StringField("Username",
         validators=[DataRequired(), check_admin])
-    give = SubmitField('Give Admin')
-    take = SubmitField('Take Admin')
+    give = SubmitField("Give Admin")
+    take = SubmitField("Take Admin")
 
 class NomIDForm(FlaskForm):
-    nomid = StringField('Nomination ID', validators=[DataRequired(), check_nom])
-    rem = SubmitField('Remove')
-    rwarn = SubmitField('Remove & Warn')
-    rban = SubmitField('Remove, Ban, & Notify')
+    nomid = StringField("Nomination ID", validators=[DataRequired(), check_nom])
+    rem = SubmitField("Remove")
+    rwarn = SubmitField("Remove & Warn")
+    rban = SubmitField("Remove, Ban, & Notify")
 
 class ResetPasswordForm(FlaskForm):
-    password = PasswordField('New Password',
+    password = PasswordField("New Password",
         validators=[DataRequired(), Length(min=passmin, max=passmax)])
 
 class ChangePasswordForm(FlaskForm):
-    currentpass = PasswordField('Current Password', validators=[DataRequired()])
-    password = PasswordField('New Password',
+    currentpass = PasswordField("Current Password", validators=[DataRequired()])
+    password = PasswordField("New Password",
         validators=[DataRequired(), Length(min=passmin, max=passmax)])
 
 class NominationForm(FlaskForm):
-    entry = StringField('Nomination')
-    award_id = HiddenField('Award ID')
+    entry = StringField("Nomination")
+    award_id = HiddenField("Award ID")
 
 class PhaseNomForm(FlaskForm):
     dtnom = DateTimeField("e.g. 1/1/2020 12:00 PM",

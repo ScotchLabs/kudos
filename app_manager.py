@@ -7,7 +7,7 @@ from itsdangerous import URLSafeTimedSerializer
 
 #Set up SQL app
 app = Flask(__name__)
-app.config.from_object('config')
+app.config.from_object("config")
 
 db = SQLAlchemy(app)
 
