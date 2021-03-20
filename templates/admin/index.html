@@ -3,134 +3,158 @@
 
 {% block body %}
 
-<a href="{{ url_for('index') }}" class="btn btn-primary">Back to Kudos Home</a>
+<style>
+    .section {
+        margin-bottom: 1.5em;
+    }
+</style>
 
-<br><br>
-
-<a href="{{ url_for('admin.list_users') }}" class="btn btn-default">Users</a>
-
-<br><br>
-
-<a href="{{ url_for('admin.index') }}" class="btn btn-default {{ 'disabled' if not full }}">Short Nom List</a>
-<a href="{{ url_for('admin.index') }}?full" class="btn btn-default {{ 'disabled' if full }}">Full Nom List</a>
-
-<br><br>
-
-<a href="{{ url_for('admin.set_phase') }}?{{ 'full&' if full }}phase=0" class="btn btn-default {{ 'disabled' if phase == 0 }}">Switch to static phase</a>
-<a href="{{ url_for('admin.set_phase') }}?{{ 'full&' if full }}phase=1" class="btn btn-default {{ 'disabled' if phase == 1 }}">Switch to nominating phase</a>
-<a href="{{ url_for('admin.set_phase') }}?{{ 'full&' if full }}phase=2" class="btn btn-default {{ 'disabled' if phase == 2 }}">Switch to voting phase</a>
-
-<br><br>
-
-<div class="row">
-    <div class="col-sm-4 col-lg-3">
-        <form method="POST" action="{{ url_for('admin.index') }}{{ '?full' if full }}">
-            {{ pnform.csrf_token }}
-            {{ pnform.dtnom(placeholder=pnform.dtnom.label.text) }}<br>
-            {{ pnform.pnon }} {{ pnform.pnoff }}
-            {{ render_errors(pnform.dtnom) }}
-        </form>
-        <br>
+<div class="breakword">
+    <div class="section">
+        <a href="{{ url_for('index') }}" class="btn btn-primary">Back to Kudos Home</a>
     </div>
-    <div class="col-sm-4 col-lg-3">
-        <form method="POST" action="{{ url_for('admin.index') }}{{ '?full' if full }}">
-            {{ pvform.csrf_token }}
-            {{ pvform.dtvote(placeholder=pvform.dtvote.label.text) }}<br>
-            {{ pvform.pvon }} {{ pvform.pvoff }}
-            {{ render_errors(pvform.dtvote) }}
-        </form>
-        <br>
+
+    <div class="section">
+        <h1><a href="{{ url_for('admin.guide') }}" class="btn btn-info">Instructions</a></h1>
     </div>
-    <div class="col-sm-4 col-lg-3">
-        <form method="POST" action="{{ url_for('admin.index') }}{{ '?full' if full }}">
-            {{ psform.csrf_token }}
-            {{ psform.dtstatic(placeholder=psform.dtstatic.label.text) }}<br>
-            {{ psform.pson }} {{ psform.psoff }}
-            {{ render_errors(psform.dtstatic) }}
-        </form>
-        <br>
+
+    <div class="section">
+        <a href="{{ url_for('admin.index') }}" class="btn btn-default{{ ' disabled' if not full }}">Short Nom List</a>
+        <a href="{{ url_for('admin.index') }}?full" class="btn btn-default{{ ' disabled' if full }}">Full Nom List</a>
     </div>
+
+    <div class="section">
+        <form method="POST" onsubmit="return submitOnce(this);">
+            {{ spform.csrf_token }}
+            {{ spform.static(class="btn btn-default", disabled=phase==0) }}
+            {{ spform.nom(class="btn btn-default", disabled=phase==1) }}
+            {{ spform.vote(class="btn btn-default", disabled=phase==2) }}
+        </form>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-4 col-lg-3 section">
+            <form method="POST" onsubmit="return submitOnce(this);">
+                {{ pnform.csrf_token }}
+                {{ pnform.dtnom(placeholder=pnform.dtnom.label.text) }}<br>
+                {{ pnform.pnon }} {{ pnform.pnoff }}
+                {{ render_errors(pnform.dtnom) }}
+            </form>
+        </div>
+        <div class="col-sm-4 col-lg-3 section">
+            <form method="POST" onsubmit="return submitOnce(this);">
+                {{ pvform.csrf_token }}
+                {{ pvform.dtvote(placeholder=pvform.dtvote.label.text) }}<br>
+                {{ pvform.pvon }} {{ pvform.pvoff }}
+                {{ render_errors(pvform.dtvote) }}
+            </form>
+        </div>
+        <div class="col-sm-4 col-lg-3 section">
+            <form method="POST" onsubmit="return submitOnce(this);">
+                {{ psform.csrf_token }}
+                {{ psform.dtstatic(placeholder=psform.dtstatic.label.text) }}<br>
+                {{ psform.pson }} {{ psform.psoff }}
+                {{ render_errors(psform.dtstatic) }}
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-4 col-lg-3 section">
+            <form method="POST" onsubmit="return submitOnce(this);">
+                {{ aform.csrf_token }}
+                {{ aform.adminuser(placeholder=aform.adminuser.label.text) }}<br>
+                {{ aform.give }} {{ aform.take }}
+                {{ render_errors(aform.adminuser) }}
+            </form>
+        </div>
+        <div class="col-sm-6 col-lg-3 section">
+            <form method="POST" onsubmit="return banHandler(this);">
+                {{ bform.csrf_token }}
+                {{ bform.banuser(placeholder=bform.banuser.label.text) }}
+                {{ bform.email }} {{ bform.email.label }}<br>
+                {{ bform.ban(onclick="buttonName(this)") }} {{ bform.unban(onclick="buttonName(this)") }}
+                {{ render_errors(bform.banuser) }}
+            </form>
+        </div>
+    </div>
+
+    <div class="section">
+        <form method="POST" onsubmit="return remHandler(this);">
+            {{ nform.csrf_token }}
+            {{ nform.nomid(placeholder=nform.nomid.label.text) }}<br>
+            {{ nform.rem(onclick="buttonName(this)") }} {{ nform.rwarn(onclick="buttonName(this)") }} {{ nform.rban(onclick="buttonName(this)") }}
+            {{ render_errors(nform.nomid) }}
+        </form>
+    </div>
+
+    <div class="section">
+        <form method="POST" onsubmit="return submitOnce(this);">
+            {{ cform.csrf_token }}
+            {{ cform.cnoms(class="btn btn-danger", onclick="return clearClick(true);") }}
+            {{ cform.cvotes(class="btn btn-danger", onclick="return clearClick(false);") }}
+        </form>
+    </div>
+
+    <h1>Nominations</h1>
+    {% for award in awards %}
+        <h2><a href="{{ url_for('admin.list_noms', awd=award.id) }}">{{ award.name }}</a></h2>
+        {% if full %}
+            {% for nom in award.nominations|sort(attribute="id") %}
+                <b>{{ nom.votes }} votes</b> | {{ nom.name }} | {{ nom.creator.username }} | ID={{ nom.id }}
+                <br>
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
 </div>
-
-<div class="row">
-    <div class="col-sm-4 col-lg-3">
-        <form method="POST" action="{{ url_for('admin.index') }}{{ '?full' if full }}">
-            {{ aform.csrf_token }}
-            {{ aform.adminuser(placeholder=aform.adminuser.label.text) }}<br>
-            {{ aform.give }} {{ aform.take }}
-            {{ render_errors(aform.adminuser) }}
-        </form>
-        <br>
-    </div>
-    <div class="col-sm-6 col-lg-3">
-        <form name="bform" method="POST" action="{{ url_for('admin.index') }}{{ '?full' if full }}">
-            {{ bform.csrf_token }}
-            {{ bform.banuser(placeholder=bform.banuser.label.text) }}
-            {{ bform.email }} {{ bform.email.label }}<br>
-            {{ bform.ban }} {{ bform.unban }}
-            {{ render_errors(bform.banuser) }}
-        </form>
-        <br>
-    </div>
-</div>
-
-<form name="nform" method="POST" action="{{ url_for('admin.index') }}{{ '?full' if full }}">
-    {{ nform.csrf_token }}
-    {{ nform.nomid(placeholder=nform.nomid.label.text) }}<br>
-    {{ nform.rem }} {{ nform.rwarn }} {{ nform.rban }}
-    {{ render_errors(nform.nomid) }}
-</form>
-
-<br>
-
-<a href="{{ url_for('admin.clear') }}?{{ 'full&' if full }}confirm=yes&select=noms" class="btn btn-danger" onclick="return confirm('Are you sure you want to permanently delete all nominations?');">Clear Nominations</a>
-<a href="{{ url_for('admin.clear') }}?{{ 'full&' if full }}confirm=yes&select=votes" class="btn btn-danger" onclick="return confirm('Are you sure you want to permanently delete all votes?');">Clear Votes</a>
 
 <script>
     // Ask for confirmation for sensitive actions
-    function onclickHandler() {
-        this.form.submitName = this.name;
-    }
+    function buttonName(button) {
+        button.form.submitName = button.name;
+    };
 
-    function banHandler() {
-        if (this.email.checked) {
-            var b = this.submitName == this.ban.name;
-            return confirm(`Are you sure you want to ${b ? "ban" : "unban"} and email ${this.banuser.value}?`);
+    function banHandler(form) {
+        if (form.submitted) {
+            return false;
         };
-    }
+        if (form.email.checked) {
+            var b = form.submitName == form.ban.name;
+            if (!confirm(`Are you sure you want to ${b ? "BAN" : "UNBAN"} and email ${form.banuser.value}?`)) {
+                return false;
+            };
+        };
+        form.submitted = true;
+        return true;
+    };
 
-    function remHandler() {
-        var msg = `Are you sure you want to remove Nomination ${this.nomid.value}`;
-        var r = this.submitName == this.rem.name;
+    function remHandler(form) {
+        if (form.submitted) {
+            return false;
+        };
+        var msg = `Are you sure you want to REMOVE Nomination ${form.nomid.value}`;
+        var r = form.submitName == form.rem.name;
         if (!r) {
-            var w = this.submitName == this.rwarn.name;
-            var b = this.submitName == this.rban.name;
-            msg += ` and ${w ? "warn" : b ? "ban/notify" : ""} the user`
-        }
-        return confirm(msg + "?");
-    }
+            var w = form.submitName == form.rwarn.name;
+            var b = form.submitName == form.rban.name;
+            msg += ` and ${w ? "WARN" : b ? "BAN/NOTIFY" : ""} the user`;
+        };
+        if (!confirm(msg + "?")) {
+            return false;
+        };
+        form.submitted = true;
+        return true;
+    };
 
-    document.bform.ban.onclick = onclickHandler;
-    document.bform.unban.onclick = onclickHandler;
-    document.bform.onsubmit = banHandler;
-
-    document.nform.rem.onclick = onclickHandler;
-    document.nform.rwarn.onclick = onclickHandler;
-    document.nform.rban.onclick = onclickHandler;
-    document.nform.onsubmit = remHandler;
+    function clearClick(noms) {
+        var sel = noms ? "NOMINATIONS" : "VOTES";
+        var msg = `Are you sure you want to PERMANENTLY DELETE all ${sel}?`;
+        msg += " This action is irreversible!";
+        if (confirm(msg)) {
+            return true;
+        };
+        return false;
+    };
 </script>
-
-<h1>Nominations</h1>
-{% for award in awards %}
-    {% if full %}
-        <h2>{{ award.name }}</h2>
-        {% for nom in award.nominations|sort(attribute="id") %}
-            <b>{{ nom.votes }} votes</b> | {{ nom.name }} | {{ nom.creator.username }} | ID={{ nom.id }}
-            <br>
-        {% endfor %}
-    {% else %}
-        <h2><a href="{{ url_for('admin.list_noms', awd=award.id) }}">{{ award.name }}</a></h2>
-    {% endif %}
-{% endfor %}
 
 {% endblock body %}

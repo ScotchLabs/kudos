@@ -11,7 +11,7 @@
             <p>Enter your username below and you will be emailed a new confirmation link</p>
         </header>
         <div class="box">
-            <form method="POST">
+            <form method="POST" onsubmit="return submitOnce(this);">
                 {{ form.csrf_token }}
                 <div class="row uniform 50%">
                     <div class="12u">

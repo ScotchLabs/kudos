@@ -1,6 +1,8 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, HiddenField, SubmitField, \
     DateTimeField, BooleanField
+from wtforms.widgets import HiddenInput
+from wtforms.fields.html5 import DateTimeLocalField
 from wtforms.validators import DataRequired, Length, ValidationError
 from app_manager import db
 from models import User, Nomination
@@ -89,23 +91,37 @@ class ChangePasswordForm(FlaskForm):
         validators=[DataRequired(), Length(min=passmin, max=passmax)])
 
 class NominationForm(FlaskForm):
-    entry = StringField("Nomination")
+    entry = StringField("Nomination") # validation handled manually
     award_id = HiddenField("Award ID")
 
+class VoteForm(FlaskForm):
+    nomid = HiddenField("Nomination ID")
+
+class SetPhaseForm(FlaskForm):
+    static = SubmitField("Switch to static phase")
+    nom = SubmitField("Switch to nominating phase")
+    vote = SubmitField("Switch to voting phase")
+
 class PhaseNomForm(FlaskForm):
-    dtnom = DateTimeField("e.g. 1/1/2020 12:00 PM",
-        format="%m/%d/%Y %I:%M %p")
+    dtnom = DateTimeLocalField(format="%Y-%m-%dT%H:%M")
     pnon = SubmitField("Schedule Nominating Phase")
     pnoff = SubmitField("Cancel")
 
 class PhaseVoteForm(FlaskForm):
-    dtvote = DateTimeField("e.g. 1/1/2020 12:00 PM",
-        format="%m/%d/%Y %I:%M %p")
+    dtvote = DateTimeLocalField(format="%Y-%m-%dT%H:%M")
     pvon = SubmitField("Schedule Voting Phase")
     pvoff = SubmitField("Cancel")
 
 class PhaseStaticForm(FlaskForm):
-    dtstatic = DateTimeField("e.g. 1/1/2020 12:00 PM",
-        format="%m/%d/%Y %I:%M %p")
+    dtstatic = DateTimeLocalField(format="%Y-%m-%dT%H:%M")
     pson = SubmitField("Schedule Static Phase")
     psoff = SubmitField("Cancel")
+
+class ClearForm(FlaskForm):
+    cnoms = SubmitField("Clear Nominations")
+    cvotes = SubmitField("Clear Votes")
+
+class RemoveNomForm(FlaskForm):
+    nomid = HiddenField("Nomination ID")
+    warn = BooleanField("Warn", widget=HiddenInput())
+    ban = BooleanField("Ban", widget=HiddenInput())

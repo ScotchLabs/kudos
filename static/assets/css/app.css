@@ -1,6 +1,36 @@
-.target:before {
-  content:"";
-  display:block;
-  height:50px; /* fixed header height*/
-  margin:-50px 0 0; /* negative fixed header height */
+.breakword {
+    word-break: break-word;
+}
+
+.award-name, .award-name * {
+    color: #d77a3d;
+}
+
+.anchor:before {
+    content: "";
+    display: block;
+    height: 75px; /* fixed header height */
+    margin: -75px 0 0; /* negative fixed header height */
+}
+
+ul.errors {
+    color: red;
+}
+
+ul.nominations li {
+    font-size: 120%;
+}
+
+@media screen and (max-width: 480px) {
+    ul.voting li {
+        padding-bottom: 1em !important;
+    }
+}
+
+.button.vote {
+    background-color: lightgreen;
+}
+
+.button.vote:hover {
+    background-color: #99f299;
 }

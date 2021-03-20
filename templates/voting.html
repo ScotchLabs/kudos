@@ -11,17 +11,16 @@
         </header>
         <div class="box">
             <span class="image featured"><img src="/static/images/snsbanner.png" alt="" /></span>
+            <form method="POST" id="voteform" action="{{ url_for('submit_vote') }}">
+                {# No need for submitOnce #}
+                {{ form.csrf_token }}
+                {{ form.nomid }}
+            </form>
             {% for award in awards %}
-                <h2 id="{{ award.id }}" class="target"><b style="color: #d77a3d">{{ award.name }}</b></h2>
-                <ul class="actions">
+                <h2 id="{{ award.id }}" class="award-name anchor"><b>{{ award.name }}</b></h2>
+                <ul class="actions vertical small nominations voting">
                     {% for nom in award.nominations|sort(attribute="id") %}
-                        {% if nom in current_user.selections %}
-                            {% set bcolor = "lightgreen" %}
-                        {% else %}
-                            {% set bcolor = "transparent" %}
-                        {% endif %}
-                        <li style="font-size: 120%"><a class="button alt icon fa-check small" name="nom{{ nom.id }}" id="{{ nom.id }}" onclick="submit_vote(this.id)" style="background-color: {{ bcolor }};">Vote</a> {{ nom.name }}</li>
-                        <br>
+                        <li><a class="button alt icon fa-check small vote-button{% if nom in current_user.selections %} vote{% endif %}" id="nom{{ nom.id }}" nomid="{{ nom.id }}">Vote</a> {{ nom.name }}</li>
                     {% endfor %}
                 </ul>
                 {% if award != awards[-1] %}
@@ -30,8 +29,7 @@
                 {% endif %}
             {% endfor %}
         </div>
-        <br>
-        <header><h3>Voting is immediate and modifiable, no need to submit!</h3></header>
+        <header style="padding-top: 1.5em;"><h3>Voting is immediate and modifiable, no need to submit!</h3></header>
     </section>
 {% endblock body %}
 

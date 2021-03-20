@@ -2,35 +2,47 @@
 
 {% block body %}
 
-<h2>{{ award.name }}</h2>
-{% for nom in award.nominations|sort(attribute="id") %}
-    <div name="nom"><b>{{ nom.votes }} votes</b> | <span>{{ nom.name }}</span> | <span>{{ nom.creator.username }}</span> | ID={{ nom.id }} | <a name="rem" href="{{ url_for('admin.remove', awd=award.id, nom=nom.id) }}">Remove</a> | <a name="warn" href="{{ url_for('admin.remove', awd=award.id, nom=nom.id, warn=nom.creator.id) }}">Remove and Warn</a> | <a name="ban" href="{{ url_for('admin.remove', awd=award.id, nom=nom.id, ban=nom.creator.id) }}">Remove, Ban, & Notify</a>
-    <br></div>
-{% endfor %}
+<div class="breakword">
+    <h2>{{ award.name }}</h2>
+    <form method="POST" onsubmit="return submitOnce(this);" id="remform">
+        {{ form.csrf_token }}
+        {{ form.nomid }}
+        {{ form.warn }}
+        {{ form.ban }}
+    </form>
+    {% for nom in award.nominations|sort(attribute="id") %}
+        <div class="nom-line">
+            <b>{{ nom.votes }} votes</b> | <span>{{ nom.name }}</span> | <span>{{ nom.creator.username }}</span> | ID=<span>{{ nom.id }}</span> | <a class="rem" href="#">Remove</a> | <a class="warn" href="#">Remove and Warn</a> | <a class="ban" href="#">Remove, Ban, & Notify</a><br>
+        </div>
+    {% endfor %}
+</div>
 
 <script>
     // Ask for confirmation for sensitive actions
     function onclickHandler() {
-        spans = this.parentElement.getElementsByTagName("span")
+        var spans = this.parentElement.getElementsByTagName("span");
         var nom = spans[0].textContent;
         var user = spans[1].textContent;
-        var msg = `Are you sure you want to remove '${nom}'`;
-        var r = this.name == "rem";
+        var nomid = spans[2].textContent;
+        var msg = `Are you sure you want to REMOVE '${nom}'`;
+        var r = this.className == "rem";
+        var w = this.className == "warn";
+        var b = this.className == "ban";
         if (!r) {
-            var w = this.name == "warn";
-            var b = this.name == "ban";
-            msg += ` and ${w ? "warn" : b ? "ban/notify" : ""} ${user}`
-        }
-        return confirm(msg + "?");
-    }
+            msg += ` and ${w ? "WARN" : b ? "BAN/NOTIFY" : ""} ${user}`;
+        };
+        if (confirm(msg + "?")) {
+            $("#nomid").val(nomid);
+            $("#warn").val(w ? "y" : "");
+            $("#ban").val(b ? "y" : "");
+            $("#remform").submit();
+        };
+        return false;
+    };
 
-    var noms = document.getElementsByName("nom");
-    for (var i = 0; i < noms.length; i++) {
-        var btns = noms[i].getElementsByTagName("a");
-        for (var j = 0; j < btns.length; j++) {
-            btns[j].onclick = onclickHandler;
-        }
-    }
+    document.addEventListener("DOMContentLoaded", function() {
+        $(".nom-line a").click(onclickHandler);
+    });
 </script>
 
 {% endblock body %}

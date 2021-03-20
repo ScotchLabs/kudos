@@ -12,10 +12,10 @@
         <div class="box">
             <span class="image featured"><img src="/static/images/snsbanner.png" alt="" /></span>
             {% for award in awards %}
-                <h2 id="{{ award.id }}" class="target"><b style="color: #d77a3d">{{ award.name }}</b></h2>
-                <ul>
+                <h2 id="{{ award.id }}" class="award-name anchor"><b>{{ award.name }}</b></h2>
+                <ul class="nominations">
                     {% for nom in award.nominations|sort(attribute="id") %}
-                        <li style="font-size: 120%">{{ nom.name }}</li>
+                        <li>{{ nom.name }}</li>
                     {% endfor %}
                 </ul>
                 {% if award != awards[-1] %}

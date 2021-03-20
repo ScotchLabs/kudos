@@ -27,6 +27,9 @@
                 sound: false
             });
         </script>
+
+        <script src="/static/assets/js/submitOnce.js"></script>
+
         {% block head %}
         {% endblock %}
     </head>
@@ -43,7 +46,7 @@
                 {% endfor %}
             {% endif %}
         {% endwith %}
-        <div id="page-wrapper">
+        <div id="page-wrapper" class="breakword">
 
             <!-- Header -->
                 {% block header_tag %}<header id="header">{% endblock %}

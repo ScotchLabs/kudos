@@ -1,0 +1,45 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+
+<div class="breakword">
+    <h1>Guide to Moderating Kudos</h1>
+
+    <p>Welcome to the <b>Kudos Admin</b> portal! This site is where you can find all the tools you need to run a smooth Kudos Awards operation. Most of the admin controls are self-explanatory, but there a few important things to know, and a few tasks you should carry out before nominations begin.</p>
+
+    <p>First, take a look around. Everything you need to worry about is on the main page. There you'll find a bunch of forms and buttons you can use to switch phases, schedule phase changes, remove nominations, and ban users. Below that, you'll find links for each award to a separate page that lists information on each nomination for that award, along with buttons to remove nominations and/or take action against the user that submitted it. On the main page you can also toggle between the condensed or full view of nominations with the Short/Full Nom List buttons at the top.</p>
+
+    <p>When removing nominations, there are 3 options:</p>
+
+    <ul>
+        <li><b>Remove</b>: simply remove the nomination.</li>
+        <li><b>Remove and Warn</b>: remove the nomination, and send an <i>Inappropriate Content Warning</i> email to the user that submitted it informing them that one of their nominations has been removed, and that continued offenses could result in a ban.</li>
+        <li><b>Remove, Ban, & Notify</b>: remove the nomination, ban the user that submitted it, and send them a notification email.</li>
+    </ul>
+
+    <p><b>Banning a user</b> means that they can no longer log in, nominate, or vote on the website. You can ban a user either via the nomination removal process, or via the ban form on the main page. The ban/unban form gives you the choice of sending a notification email. Always use these two methods to ban a user, as this will invalidate their login so they are properly kicked out from the website. <b>NEVER</b> use the database tools (described below) to ban a user, as this will leave them logged in.</p>
+
+    <p>On the navigation pane, you will find tabs for Users, Awards, Nominations, and State. These are database tools, and you will almost never need to use them.</p>
+
+    <h2>Action required!</h2>
+
+    <p>Before beginning, there are some things you should do first.</p>
+
+    <h3>Filter out alumni</h3>
+
+    <p>User accounts are not deleted between years, so there will be active users who have graduated. If you would like to deactivate the accounts of alumni (so they can't log in and interact with nominations), you can do so via the User database tool. If you go through each user, you can edit each one you want and <i>uncheck</i> the box next to <i>Email confirmed</i>, then <i>Save</i>.</p>
+
+    <p>This will make it so that they can't log in, and they won't be able to reconfirm their email as their andrew email will have been deactivated by the school. This also leaves room for error on your part, because if you accidentally deactivate someone who is still a student, they'll be able to simply resend the confirmation email from the login page.</p>
+
+    <p>When going through the list of users, you can sort by clicking the <i>Email Confirmed</i> column header (click twice to list active users first) to make your search more efficient. But be careful about opening separate tabs, as the order of the list will naturally change as you go.</p>
+
+    <h3>Unban users</h3>
+
+    <p>In the User database tool, you can sort by the <i>Banned</i> column header (click twice to list banned users first) to see if anyone is still banned from the previous year. You can decide whether or not to unban them.</p>
+
+    <h3>Clear all entries</h3>
+
+    <p>In case it hasn't been done already, you can clear all nominations from the previous year with the big red button on the main page.</p>
+</div>
+
+{% endblock body %}

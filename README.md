@@ -45,13 +45,13 @@ To get started, set up a Heroku account and download the [Heroku CLI](https://de
 heroku create sns-kudos
 ```
 
-Then add a database to the application:
+When that completes, take note of the herokuapp url it gives you. This is where your application will be hosted (at least for now). Then add a database to the application:
 
 ```
 heroku addons:create heroku-postgresql:hobby-dev
 ```
 
-When that completes, take note of the herokuapp url it gives you. This is where your application will be hosted (at least for now). Then, run
+Then, run
 
 ```
 python config_heroku.py
@@ -72,7 +72,7 @@ heroku run python dbutils.py init_db
 Then, head over to the herokuapp url mentioned above, and make sure everything works fine. Like before, test creating an account and submitting nominations. Sometimes there are security issues with sending emails once the app has been deployed, so make sure email sending functions work (like when you create an account or request a password reset), and fix any problems if they arise. Then, like before, make yourself an admin by running
 
 ```
-heroku run python dbutils.py give_admin username
+heroku run python dbutils.py give_admin <username>
 ```
 
 You can also use the function `init_user_admin(username)` from `dbutils.py` to make an admin account if you want to skip the setup process. The password of an account created this way will be "password" but this can be changed from the website. You will also find the same default password if you create a user from the admin interface.
@@ -85,4 +85,4 @@ Note: you can use custom domains on free dynos, but those won't have SSL certifi
 
 # Not from CMU?
 
-You can modify this application to support non cmu email addresses. If your organization uses a different unified email domain, you can simply change the `default_email` function in `models.py` to use your domain instead of the andrew.cmu.edu domain. To support arbitrary emails, you could either add an email field to the account signup form, or go through the whole application and combine the username and email attributes into one (i.e. make it so that the username is their email). For the former, you should also look into the password recovery page and add an option for submitting your email in case they forgot their username. In any case, you should change the form titles that currently say "Andrew ID" to whatever method you choose.
+You can modify this application to support non cmu email addresses. If your organization uses a different unified email domain, you can simply change the `default_email` function in `models.py` to use your domain instead of the andrew.cmu.edu domain. To support arbitrary emails, you could either add an email field to the account signup form, or go through the whole application and combine the username and email attributes into one (i.e. make it so that the username is their email). For the former, you should also look into the password recovery page and add an option for submitting your email in case they forgot their username. In any case, you should also change the form titles and various text that currently say "Andrew ID" to whatever method you choose.

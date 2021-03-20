@@ -1,7 +1,7 @@
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask_login import UserMixin
 import time
-from app_manager import db, bcrypt
+from app_manager import db, bcrypt, serializer
 
 users = db.Table("users",
     db.Column("user_id", db.Integer, db.ForeignKey("user.id"),
@@ -21,18 +21,14 @@ def default_password():
     # decode string to avoid invalid salt error with postgres
     return bcrypt.generate_password_hash("password").decode("utf-8")
 
-def default_token():
-    return bcrypt.generate_password_hash(str(time.time()))
-
 class User(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(16), unique=True, nullable=False)
     _password = db.Column(db.String(128), nullable=False,
                           default=default_password)
     email = db.Column(db.String(128), nullable=False, default=default_email)
     email_confirmed = db.Column(db.Boolean, default=False, nullable=False)
-    session_token = db.Column(db.String(128), nullable=False,
-                              default=default_token)
+    sessTokenTime = db.Column(db.Float, nullable=False, default=time.time)
     banned = db.Column(db.Boolean, default=False, nullable=False)
     is_admin = db.Column(db.Boolean, default=False, nullable=False)
 
@@ -50,7 +46,7 @@ class User(db.Model, UserMixin):
         return bcrypt.check_password_hash(self._password, plaintext)
 
     def reset_token(self):
-        self.session_token = bcrypt.generate_password_hash(str(time.time()))
+        self.sessTokenTime = time.time()
 
     def ban(self):
         self.banned = True
@@ -68,14 +64,14 @@ class User(db.Model, UserMixin):
     # Flask-Login properties
     @property
     def is_authenticated(self):
-        return self.email_confirmed
+        return True
 
     @property
     def is_active(self):
-        return not self.banned
+        return not self.banned and self.email_confirmed
 
     def get_id(self):
-        return self.session_token
+        return serializer.dumps([self.id, self.sessTokenTime], salt="session")
 
     def __repr__(self):
         return "<User %r>" % self.username

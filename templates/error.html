@@ -9,13 +9,10 @@
             <h2>Error</h2>
             <p>This page does not exist or something else went wrong</p>
         </header>
-        <div class="box">
-            <div class="align-center">
-                <h3>{{ error.code }} {{ error.name }}</h3>
-                {{ error.description }}
-                <br><br><br>
-                <a href="{{ url_for('index') }}" class="button">Return to Home Page</a>
-            </div>
+        <div class="box align-center">
+            <h3>{{ error.code }} {{ error.name }}</h3>
+            <p>{{ error.description }}</p>
+            <a href="{{ url_for('index') }}" class="button">Return to Home Page</a>
         </div>
     </section>
 {% endblock body %}

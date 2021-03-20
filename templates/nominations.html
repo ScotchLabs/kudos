@@ -3,18 +3,6 @@
 
 {% block title %}Nominations | Kudos{% endblock %}
 
-{% block head %}
-<script>
-    var submitted = false;
-    function buttonClick(button) {
-        if (!submitted)
-            submitted = true;
-        else
-            button.disabled = true;
-    }
-</script>
-{% endblock head %}
-
 {% block body %}
 <!-- Main -->
     <section id="main" class="container">
@@ -28,13 +16,13 @@
         <div class="box">
             <span class="image featured"><img src="/static/images/snsbanner.png" alt="" /></span>
             {% for award in awards %}
-                <h2 id="{{ award.id }}" class="target"><b style="color: #d77a3d">{{ award.name }}</b></h2>
-                <ul>
+                <h2 id="{{ award.id }}" class="award-name anchor"><b>{{ award.name }}</b></h2>
+                <ul class="nominations">
                     {% for nom in award.nominations|sort(attribute="id") %}
-                        <li style="font-size: 120%">{{ nom.name }}</li>
+                        <li>{{ nom.name }}</li>
                     {% endfor %}
                 </ul>
-                <form method="POST">
+                <form method="POST" onsubmit="return submitOnce(this);" action="{{ url_for('awards', _anchor=award.id) }}">
                     <div class="row uniform 50%">
                         <div class="9u 12u(mobilep)">
                             {{ form.csrf_token }}
@@ -42,7 +30,7 @@
                             {{ form.entry(placeholder=form.entry.label.text) }}
                         </div>
                         <div class="3u 12u(mobilep)">
-                            <input type="submit" value="Submit" class="fit" onclick="buttonClick(this);" />
+                            <input type="submit" value="Submit" class="fit">
                         </div>
                     </div>
                     {{ render_errors(form.entry) }}

@@ -1,5 +1,5 @@
 from flask_login import LoginManager
-from app_manager import app
+from app_manager import app, serializer
 from models import User
 
 login_manager = LoginManager(app)
@@ -8,4 +8,8 @@ login_manager.login_message_category = "error"
 
 @login_manager.user_loader
 def load_user(session_token):
-    return User.query.filter_by(session_token=session_token).first()
+    try:
+        uid, tokTime = serializer.loads(session_token, salt="session")
+        return User.query.filter_by(id=uid, sessTokenTime=tokTime).first()
+    except:
+        return None

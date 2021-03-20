@@ -1,16 +1,14 @@
-Hello.
+<p>Hello.</p>
 
-{% if award_name is not none %}
-    One of your entries for "{{ award_name }}" on the Kudos nomination
-    system has been taken down for inappropriate content. Additionally,
-{% else %}
-    This email is to notify you that
-{% endif %}
+<p>
+    {% if award_name is not none %}
+        One of your entries for "{{ award_name }}" on the Kudos nomination system has been taken down for inappropriate content. Additionally,
+    {% else %}
+        This email is to notify you that
+    {% endif %}
 
-your account has been banned from the Kudos Awards system as a result of
-repeated inappropriate conduct. You will no longer be able to log in, nominate,
-or vote on the website. If you would like to appeal this action, please contact
-system administrators.
+    your account has been banned from the Kudos Awards system as a result of repeated inappropriate conduct. You will no longer be able to log in, nominate, or vote on the website. If you would like to appeal this action, please contact system administrators.
+</p>
 
 <p>
 --<br>
