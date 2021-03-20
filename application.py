@@ -1,4 +1,4 @@
-import itsdangerous, json, atexit, traceback
+import itsdangerous, json, atexit, traceback, logging
 
 from flask import redirect, render_template, url_for, abort, \
     flash, request
