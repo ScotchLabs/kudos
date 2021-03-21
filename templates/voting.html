@@ -17,16 +17,18 @@
                 {{ form.nomid }}
             </form>
             {% for award in awards %}
-                <h2 id="{{ award.id }}" class="award-name anchor"><b>{{ award.name }}</b></h2>
-                <ul class="actions stacked small nominations voting">
-                    {% for nom in award.nominations|sort(attribute="id") %}
-                        <li><a class="button alt icon solid fa-check small vote-button{% if nom in current_user.selections %} vote{% endif %}" id="nom{{ nom.id }}" nomid="{{ nom.id }}">Vote</a> {{ nom.name }}</li>
-                    {% endfor %}
-                </ul>
-                {% if award != awards[-1] %}
-                    {# Only put lines between awards, not after the last one #}
-                    <hr>
-                {% endif %}
+                <div class="anchor" id="{{ award.id }}">
+                    <h2 class="award-name"><b>{{ award.name }}</b></h2>
+                    <ul class="actions stacked small nominations voting">
+                        {% for nom in award.nominations|sort(attribute="id") %}
+                            <li><a class="button alt icon solid fa-check small vote-button{% if nom in current_user.selections %} vote{% endif %}" id="nom{{ nom.id }}" nomid="{{ nom.id }}">Vote</a> {{ nom.name }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% if award != awards[-1] %}
+                        {# Only put lines between awards, not after the last one #}
+                        <hr>
+                    {% endif %}
+                </div>
             {% endfor %}
         </div>
         <header style="padding-top: 1.5em;"><h3>Voting is immediate and modifiable, no need to submit!</h3></header>

@@ -91,7 +91,8 @@ class ChangePasswordForm(FlaskForm):
         validators=[DataRequired(), Length(min=passmin, max=passmax)])
 
 class NominationForm(FlaskForm):
-    entry = StringField("Nomination") # validation handled manually
+    entry = HiddenField("Nomination",
+        validators=[DataRequired(), Length(max=128)])
     award_id = HiddenField("Award ID")
 
 class VoteForm(FlaskForm):

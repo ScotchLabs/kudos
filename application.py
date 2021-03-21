@@ -208,16 +208,10 @@ def awards():
     form = NominationForm()
     if form.validate_on_submit():
         award = Award.query.filter_by(id=form.award_id.data).first_or_404()
-        if len(form.entry.data) < 1:
-            flash("Cannot submit empty nominations", "error")
-        elif len(form.entry.data) > 128:
-            flash("Nominations must not exceed 128 characters", "error")
-            form.entry.data = None
-        else:
-            award.nominations.append(Nomination(name=form.entry.data,
-                                                creator=current_user))
-            db.session.commit()
-            flash("Nomination successful!", "success")
+        award.nominations.append(Nomination(name=form.entry.data,
+                                            creator=current_user))
+        db.session.commit()
+        flash("Nomination successful!", "success")
         return redirect(url_for("awards"))
     return render_template("nominations.html", form=form, awards=list_awards())
 
