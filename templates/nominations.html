@@ -14,7 +14,7 @@
             </p>
         </header>
         <div class="box">
-            <span class="image featured"><img src="/static/images/snsbanner.png" alt="" /></span>
+            <span class="image featured"><img src="/static/images/snsbanner.png" alt=""></span>
             {% for award in awards %}
                 <h2 id="{{ award.id }}" class="award-name anchor"><b>{{ award.name }}</b></h2>
                 <ul class="nominations">
@@ -23,17 +23,17 @@
                     {% endfor %}
                 </ul>
                 <form method="POST" onsubmit="return submitOnce(this);" action="{{ url_for('awards', _anchor=award.id) }}">
-                    <div class="row uniform 50%">
-                        <div class="9u 12u(mobilep)">
-                            {{ form.csrf_token }}
-                            {{ form.award_id(value=award.id) }}
+                    {{ form.csrf_token }}
+                    {{ form.award_id(value=award.id) }}
+                    <div class="row gtr-50 gtr-uniform">
+                        <div class="col-9 col-12-mobilep">
                             {{ form.entry(placeholder=form.entry.label.text) }}
+                            {{ render_errors(form.entry) }}
                         </div>
-                        <div class="3u 12u(mobilep)">
+                        <div class="col-3 col-12-mobilep">
                             <input type="submit" value="Submit" class="fit">
                         </div>
                     </div>
-                    {{ render_errors(form.entry) }}
                 </form>
                 {% if award != awards[-1] %}
                     {# Only put lines between awards, not after the last one #}

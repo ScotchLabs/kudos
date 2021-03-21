@@ -8,17 +8,14 @@
     <head>
         <title>{% block title %}{% endblock %}</title>
         <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <!--[if lte IE 8]><script src="/static/assets/js/ie/html5shiv.js"></script><![endif]-->
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
         <link rel="stylesheet" href="/static/assets/css/main.css" />
-        <!--[if lte IE 8]><link rel="stylesheet" href="/static/assets/css/ie8.css" /><![endif]-->
-        <link rel="icon" href="/static/images/oscar.png"/>
-
-        <link rel="stylesheet" href="/static/assets/font-awesome/css/font-awesome.min.css"/>
-        <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
         <link rel="stylesheet" href="/static/assets/css/app.css">
-        <link rel="stylesheet" href="/static/assets/dist/css/lobibox.min.css">
-        <script src="/static/assets/dist/js/lobibox.min.js"></script>
+        <link rel="icon" href="/static/images/oscar.png">
+
+        <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+        <link rel="stylesheet" href="/static/assets/lobibox/css/lobibox.min.css">
+        <script src="/static/assets/lobibox/js/lobibox.min.js"></script>
         <script>
             Lobibox.notify.DEFAULTS = $.extend({}, Lobibox.notify.DEFAULTS, {
                 iconSource: 'fontAwesome'
@@ -34,7 +31,7 @@
         {% endblock %}
     </head>
 
-    {% block body_tag %}<body>{% endblock %}
+    {% block body_tag %}<body class="is-preload">{% endblock %}
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -57,7 +54,7 @@
                             {% if current_user.is_authenticated %}
                                 <li><a href="{{ url_for('awards') }}">Awards</a></li>
                                 <li>
-                                    <a class="icon fa-angle-down">{{ current_user.username }}</a>
+                                    <a class="icon solid fa-angle-down">{{ current_user.username }}</a>
                                     <ul>
                                         {% if current_user.is_admin %}
                                             <li><a href="{{ url_for('admin.index') }}">Admin</a></li>
@@ -80,10 +77,10 @@
             <!-- Footer -->
                 <footer id="footer">
                     <ul class="icons">
-                        <li><a href="https://www.facebook.com/snstheatre/" class="icon fa-facebook" target="_blank"><span class="label">Facebook</span></a></li>
-                        <li><a href="https://www.instagram.com/scotchnsodatheatre/" class="icon fa-instagram" target="_blank"><span class="label">Instagram</span></a></li>
-                        <li><a href="https://twitter.com/snstheatre" class="icon fa-twitter" target="_blank"><span class="label">Twitter</span></a></li>
-                        <li><a href="https://github.com/ScotchLabs/kudos" class="icon fa-github" target="_blank"><span class="label">Github</span></a></li>
+                        <li><a href="https://www.facebook.com/snstheatre/" class="icon brands fa-facebook-f" target="_blank"><span class="label">Facebook</span></a></li>
+                        <li><a href="https://www.instagram.com/scotchnsodatheatre/" class="icon brands fa-instagram" target="_blank"><span class="label">Instagram</span></a></li>
+                        <li><a href="https://twitter.com/snstheatre" class="icon brands fa-twitter" target="_blank"><span class="label">Twitter</span></a></li>
+                        <li><a href="https://github.com/ScotchLabs/kudos" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
                     </ul>
                     <ul class="copyright">
                         <li>&copy; <a href="http://www.snstheatre.org" target="_blank">Scotch'n'Soda Theatre</a></li><li>Website: <a href="https://github.com/gseastream" target="_blank">Grant Seastream</a></li><li>Design: <a href="http://html5up.net" target="_blank">HTML5 UP</a></li>
@@ -95,10 +92,10 @@
         <!-- Scripts -->
             <script src="/static/assets/js/jquery.min.js"></script>
             <script src="/static/assets/js/jquery.dropotron.min.js"></script>
-            <script src="/static/assets/js/jquery.scrollgress.min.js"></script>
-            <script src="/static/assets/js/skel.min.js"></script>
+            <script src="/static/assets/js/jquery.scrollex.min.js"></script>
+            <script src="/static/assets/js/browser.min.js"></script>
+            <script src="/static/assets/js/breakpoints.min.js"></script>
             <script src="/static/assets/js/util.js"></script>
-            <!--[if lte IE 8]><script src="/static/assets/js/ie/respond.min.js"></script><![endif]-->
             <script src="/static/assets/js/main.js"></script>
             {% block scripts %}
             {% endblock %}

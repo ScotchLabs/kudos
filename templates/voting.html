@@ -10,7 +10,7 @@
             <p>Use the buttons below to vote for your favorite in each category! Voting is immediate and modifiable, no need to submit!</p>
         </header>
         <div class="box">
-            <span class="image featured"><img src="/static/images/snsbanner.png" alt="" /></span>
+            <span class="image featured"><img src="/static/images/snsbanner.png" alt=""></span>
             <form method="POST" id="voteform" action="{{ url_for('submit_vote') }}">
                 {# No need for submitOnce #}
                 {{ form.csrf_token }}
@@ -18,9 +18,9 @@
             </form>
             {% for award in awards %}
                 <h2 id="{{ award.id }}" class="award-name anchor"><b>{{ award.name }}</b></h2>
-                <ul class="actions vertical small nominations voting">
+                <ul class="actions stacked small nominations voting">
                     {% for nom in award.nominations|sort(attribute="id") %}
-                        <li><a class="button alt icon fa-check small vote-button{% if nom in current_user.selections %} vote{% endif %}" id="nom{{ nom.id }}" nomid="{{ nom.id }}">Vote</a> {{ nom.name }}</li>
+                        <li><a class="button alt icon solid fa-check small vote-button{% if nom in current_user.selections %} vote{% endif %}" id="nom{{ nom.id }}" nomid="{{ nom.id }}">Vote</a> {{ nom.name }}</li>
                     {% endfor %}
                 </ul>
                 {% if award != awards[-1] %}

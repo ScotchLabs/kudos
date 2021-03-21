@@ -4,12 +4,12 @@
 
 {% block body %}
 <!-- Main -->
-    <section id="main" class="container 75%">
+    <section id="main" class="container medium">
         <header>
             <h2>Error</h2>
             <p>This page does not exist or something else went wrong</p>
         </header>
-        <div class="box align-center">
+        <div class="box special">
             <h3>{{ error.code }} {{ error.name }}</h3>
             <p>{{ error.description }}</p>
             <a href="{{ url_for('index') }}" class="button">Return to Home Page</a>

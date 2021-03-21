@@ -5,7 +5,7 @@
 
 {% block body %}
 <!-- Main -->
-    <section id="main" class="container 75%">
+    <section id="main" class="container medium">
         <header>
             <h2>Create an Account</h2>
             <p>Sign up so you can start participating!</p>
@@ -13,21 +13,17 @@
         <div class="box">
             <form method="POST" onsubmit="return submitOnce(this);">
                 {{ form.csrf_token }}
-                <div class="row uniform 50%">
-                    <div class="12u">
+                <div class="row gtr-50 gtr-uniform">
+                    <div class="col-12">
                         {{ form.username(placeholder=form.username.label.text) }}
                         {{ render_errors(form.username) }}
                     </div>
-                </div>
-                <div class="row uniform 50%">
-                    <div class="12u">
+                    <div class="col-12">
                         {{ form.password(placeholder=form.password.label.text) }}
                         {{ render_errors(form.password) }}
                     </div>
-                </div>
-                <div class="row uniform 50%">
-                    <div class="12u">
-                        <ul class="actions align-center">
+                    <div class="col-12">
+                        <ul class="actions special">
                             <li><input type="submit" value="Register"></li>
                         </ul>
                     </div>

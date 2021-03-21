@@ -2,25 +2,25 @@
 
 {% block title %}Kudos | Scotch'n'Soda{% endblock %}
 
+{% block body_tag %}<body class="landing is-preload">{% endblock %}
 {% block header_tag %}<header id="header" class="alt">{% endblock %}
-{% block body_tag %}<body class="landing">{% endblock %}
 
 {% block body %}
 <!-- Banner -->
     <section id="banner">
         <h2>Kudos Awards!</h2>
         <p>Celebrating the best of the season in Scotch'n'Soda Theatre</p>
-        <ul class="actions">
+        <ul class="actions special">
             {% if current_user.is_authenticated %}
                 {% if phase == 0 %}
-                    <li><a href="{{ url_for('awards') }}" class="button special">View Nominees</a></li>
+                    <li><a href="{{ url_for('awards') }}" class="button primary">View Nominees</a></li>
                 {% elif phase == 1 %}
-                    <li><a href="{{ url_for('awards') }}" class="button special">Nominations!</a></li>
+                    <li><a href="{{ url_for('awards') }}" class="button primary">Nominations!</a></li>
                 {% else %}
-                    <li><a href="{{ url_for('awards') }}" class="button special">Time to vote!</a></li>
+                    <li><a href="{{ url_for('awards') }}" class="button primary">Time to vote!</a></li>
                 {% endif %}
             {% else %}
-                <li><a href="{{ url_for('signup') }}" class="button special">Create an Account</a></li>
+                <li><a href="{{ url_for('signup') }}" class="button primary">Create an Account</a></li>
                 <li><a href="{{ url_for('signin') }}" class="button">Sign In</a></li>
             {% endif %}
         </ul>

@@ -34,3 +34,26 @@ ul.nominations li {
 .button.vote:hover {
     background-color: #99f299;
 }
+
+/* Extra template definitions */
+
+ul.actions.small li {
+    padding: 0 0.5em 0 0;
+}
+
+ul.actions.stacked.small li {
+    padding: 0.5em 0 0 0;
+}
+
+ul.actions.stacked.small li:first-child {
+    padding-top: 0;
+}
+
+ul.actions.fit.small {
+    margin-left: -0.5em;
+    width: calc(100% + 0.5em);
+}
+
+ul.actions.fit.small li {
+    padding: 0 0 0 0.5em;
+}
