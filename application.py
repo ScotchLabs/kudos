@@ -216,13 +216,17 @@ def awards():
     return render_template("nominations.html", form=form, awards=list_awards())
 
 @app.route("/submit_vote", methods=["POST"])
-@login_required
 def submit_vote():
     result = { "success" : 0,
                "message" : "An error occurred" }
     if phase() != 2:
         result["message"] = "Not voting phase!"
         return json.dumps(result), 200 # return 200 so message displays
+
+    if not current_user.is_authenticated:
+        # rather than login_required, this allows returning a json
+        result["message"] = "Not logged in"
+        return json.dumps(result), 200
 
     form = VoteForm()
     if form.validate() or True:

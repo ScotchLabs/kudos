@@ -10,6 +10,11 @@ login_manager.login_message_category = "error"
 def load_user(session_token):
     try:
         uid, tokTime = serializer.loads(session_token, salt="session")
-        return User.query.filter_by(id=uid, sessTokenTime=tokTime).first()
+        u = User.query.filter_by(id=uid, sessTokenTime=tokTime).first()
+        if u is not None and u.is_active:
+            # refuse to recognize inactive accounts
+            # this won't reset their token, but they won't appear logged in
+            return u
     except:
-        return None
+        pass
+    return None
