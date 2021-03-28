@@ -120,13 +120,14 @@ def signin():
         elif user.is_correct_password(form.password.data):
             if user.banned:
                 flash("Your account has been banned", "error")
-            else:
-                login_user(user, remember=True)
+            elif login_user(user, remember=True):
                 flash("Logged in successfully", "success")
                 next_url = request.args.get("next")
                 if not is_safe_url(next_url):
                     abort(400)
                 return redirect(next_url or url_for("index"))
+            else:
+                flash("Account inactive", "error")
         else:
             flash("Password incorrect, try again", "error")
     return render_template("signin.html", form=form)
