@@ -18,7 +18,6 @@ mail = Mail(app)
 SSLify(app) # force https, only when debug is false, breaks on localhost
 
 DAY = 86400
-MONTH = 2592000
 
 ts = URLSafeTimedSerializer(app.config["SECRET_KEY"])
 
