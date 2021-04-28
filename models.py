@@ -21,6 +21,9 @@ def default_password():
     # decode string to avoid invalid salt error with postgres
     return bcrypt.generate_password_hash("password").decode("utf-8")
 
+def default_token():
+    return int(time.time())
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(16), unique=True, nullable=False)
@@ -28,7 +31,7 @@ class User(db.Model, UserMixin):
                           default=default_password)
     email = db.Column(db.String(128), nullable=False, default=default_email)
     email_confirmed = db.Column(db.Boolean, default=False, nullable=False)
-    sessTokenTime = db.Column(db.Float, nullable=False, default=time.time)
+    sessTokenTime = db.Column(db.Integer, nullable=False, default=default_token)
     banned = db.Column(db.Boolean, default=False, nullable=False)
     is_admin = db.Column(db.Boolean, default=False, nullable=False)
 
@@ -46,7 +49,7 @@ class User(db.Model, UserMixin):
         return bcrypt.check_password_hash(self._password, plaintext)
 
     def reset_token(self):
-        self.sessTokenTime = time.time()
+        self.sessTokenTime = int(time.time())
 
     def ban(self):
         self.banned = True
