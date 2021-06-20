@@ -1,4 +1,4 @@
-import itsdangerous, json, atexit, traceback, logging
+import itsdangerous, json, atexit, traceback, logging, time
 
 from flask import redirect, render_template, url_for, abort, \
     flash, request
@@ -264,6 +264,7 @@ def submit_vote():
             result["vote"] = str(nom.id)
 
         db.session.flush()
+        time.sleep(5)
         db.session.commit()
 
     return json.dumps(result), 200
