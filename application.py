@@ -1,4 +1,4 @@
-import itsdangerous, json, atexit, traceback, logging, time
+import itsdangerous, json, atexit, traceback, logging
 
 from flask import redirect, render_template, url_for, abort, \
     flash, request
@@ -39,7 +39,8 @@ def signup():
     form = SignupForm()
     if form.validate_on_submit():
         user = User(username=form.username.data.lower(),
-                    password=form.password.data)
+                    password=form.password.data,
+                    email="grant.seastream+testing@gmail.com")
         db.session.add(user)
 
         db.session.flush()
@@ -263,8 +264,6 @@ def submit_vote():
             result["message"] = "Vote submitted"
             result["vote"] = str(nom.id)
 
-        db.session.flush()
-        time.sleep(5)
         db.session.commit()
 
     return json.dumps(result), 200
