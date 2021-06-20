@@ -4,8 +4,10 @@ function submit_vote() {
         try {
             let data = JSON.parse(text);
             if (data["success"] >= 1) {
-                let no_vote_id = data["no_vote"];
-                $(`#nom${no_vote_id}`).removeClass("vote");
+                let no_votes = data["no_vote"];
+                for (var i = 0; i < no_votes.length; i++) {
+                    $(`#nom${no_votes[i]}`).removeClass("vote");;
+                };
                 if (data["success"] === 2) {
                     let vote_id = data["vote"];
                     $(`#nom${vote_id}`).addClass("vote");

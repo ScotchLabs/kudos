@@ -236,27 +236,34 @@ def submit_vote():
             nom_id = int(form.nomid.data)
         except:
             return json.dumps(result), 200
+
         nom = Nomination.query.filter_by(id=nom_id).first()
+
         if nom is None:
             return json.dumps(result), 200
-        for sel in current_user.selections:
-            if sel in nom.award.nominations:
-                # take away vote from other nom in this category
-                # clicking same button will simply remove the vote
-                current_user.selections.remove(sel)
-                result["no_vote"] = str(sel.id)
-                if sel == nom:
-                    # we removed the vote, so we are done
-                    result["success"] = 1
-                    result["message"] = "Vote removed"
-                    db.session.commit()
-                    return json.dumps(result), 200
-                break
-        # only add vote if it was a different nomination's button
-        nom.voters.append(current_user)
-        result["success"] = 2
-        result["message"] = "Vote submitted"
-        result["vote"] = str(nom.id)
+
+        result["no_vote"] = []
+
+        rems = set(nom.award.nominations).intersection(current_user.selections)
+
+        for rem in rems:
+            # take away vote from other nom in this category
+            # clicking same button will simply remove the vote
+            current_user.selections.remove(rem)
+            result["no_vote"].append(str(rem.id))
+
+        if nom in rems:
+            # we removed the vote, so we are done
+            result["success"] = 1
+            result["message"] = "Vote removed"
+        else:
+            # only add vote if it was a different nomination's button
+            nom.voters.append(current_user)
+            result["success"] = 2
+            result["message"] = "Vote submitted"
+            result["vote"] = str(nom.id)
+
+        db.session.flush()
         db.session.commit()
 
     return json.dumps(result), 200
