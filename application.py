@@ -17,6 +17,7 @@ from models import User, Award, Nomination, State
 from login_manager import login_manager
 from dbutils import clear_noms, clear_votes
 
+from sqlalchemy.exc import InvalidRequestError
 from werkzeug.exceptions import default_exceptions
 from urllib.parse import urlparse, urljoin
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -497,10 +498,16 @@ def handle_error(e):
 def init_error_mail():
     class MySMTPHandler(SMTPHandler):
         def emit(self, record):
+            record.username = None
             if current_user and current_user.is_authenticated:
-                record.username = current_user.username
-            else:
-                record.username = None
+                try:
+                    record.username = current_user.username
+                except InvalidRequestError:
+                    # assume db is in failed state, will be rolled back anyway
+                    db.session.rollback()
+                    record.username = current_user.username
+                except:
+                    pass
             return super().emit(record)
 
         def getSubject(self, record):
