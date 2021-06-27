@@ -264,6 +264,7 @@ def submit_vote():
             result["vote"] = str(nom.id)
 
         db.session.flush()
+        db.session.refresh(current_user)
 
         if validate_votes(nom, current_user):
             db.session.commit()
