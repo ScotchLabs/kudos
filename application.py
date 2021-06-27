@@ -263,7 +263,14 @@ def submit_vote():
             result["message"] = "Vote submitted"
             result["vote"] = str(nom.id)
 
-        db.session.commit()
+        db.session.flush()
+
+        if validate_votes(nom, current_user):
+            db.session.commit()
+        else:
+            db.session.rollback()
+            result["success"] = 0
+            result["message"] = "Stop trying to exploit my app!"
 
     return json.dumps(result), 200
 
@@ -575,6 +582,10 @@ def is_safe_url(target):
     test_url = urlparse(urljoin(request.host_url, target))
     return (test_url.scheme in ("http", "https") and
             ref_url.netloc == test_url.netloc)
+
+def validate_votes(nom, user):
+    awd_votes = set(nom.award.nominations).intersection(user.selections)
+    return len(awd_votes) < 2
 
 def phase():
     return State.query.first().phase
