@@ -17,7 +17,7 @@ from models import User, Award, Nomination, State
 from login_manager import login_manager
 from dbutils import clear_noms, clear_votes
 
-from sqlalchemy.exc import InvalidRequestError
+from sqlalchemy.exc import InvalidRequestError, IntegrityError
 from werkzeug.exceptions import default_exceptions
 from urllib.parse import urlparse, urljoin
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -42,7 +42,11 @@ def signup():
                     password=form.password.data)
         db.session.add(user)
 
-        db.session.flush()
+        # need to catch in case two sessions create user at once
+        try:
+            db.session.flush()
+        except IntegrityError:
+            abort(400)
 
         if send_confirm_link(user.id, user.email):
             db.session.commit()
