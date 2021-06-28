@@ -17,7 +17,7 @@ from models import User, Award, Nomination, State
 from login_manager import login_manager
 from dbutils import clear_noms, clear_votes
 
-from sqlalchemy.exc import InvalidRequestError, IntegrityError
+from sqlalchemy.exc import InvalidRequestError
 from werkzeug.exceptions import default_exceptions
 from urllib.parse import urlparse, urljoin
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -230,6 +230,10 @@ def submit_vote():
         result["message"] = "Not logged in"
         return json.dumps(result), 200
 
+    # fetch via with_for_update to lock this row
+    user = User.query.filter_by(
+        id=current_user.id).with_for_update().first_or_404()
+
     form = VoteForm()
     if form.validate() or True:
         try:
@@ -244,12 +248,12 @@ def submit_vote():
 
         result["no_vote"] = []
 
-        rems = set(nom.award.nominations).intersection(current_user.selections)
+        rems = set(nom.award.nominations).intersection(user.selections)
 
         for rem in rems:
             # take away vote from other nom in this category
             # clicking same button will simply remove the vote
-            current_user.selections.remove(rem)
+            user.selections.remove(rem)
             result["no_vote"].append(str(rem.id))
 
         if nom in rems:
@@ -258,25 +262,12 @@ def submit_vote():
             result["message"] = "Vote removed"
         else:
             # only add vote if it was a different nomination's button
-            nom.voters.append(current_user)
+            nom.voters.append(user)
             result["success"] = 2
             result["message"] = "Vote submitted"
             result["vote"] = str(nom.id)
 
-        passed = False
-        try:
-            db.session.flush()
-            db.session.refresh(current_user)
-            passed = True
-        except IntegrityError:
-            pass
-
-        if passed and validate_votes(nom, current_user):
-            db.session.commit()
-        else:
-            db.session.rollback()
-            result["success"] = 0
-            result["message"] = "Stop trying to exploit the app!"
+        db.session.commit()
 
     return json.dumps(result), 200
 
@@ -588,10 +579,6 @@ def is_safe_url(target):
     test_url = urlparse(urljoin(request.host_url, target))
     return (test_url.scheme in ("http", "https") and
             ref_url.netloc == test_url.netloc)
-
-def validate_votes(nom, user):
-    awd_votes = set(nom.award.nominations).intersection(user.selections)
-    return len(awd_votes) < 2
 
 def phase():
     return State.query.first().phase
