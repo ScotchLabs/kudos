@@ -17,7 +17,7 @@ from models import User, Award, Nomination, State
 from login_manager import login_manager
 from dbutils import clear_noms, clear_votes
 
-from sqlalchemy.exc import InvalidRequestError
+from sqlalchemy.exc import InvalidRequestError, IntegrityError
 from werkzeug.exceptions import default_exceptions
 from urllib.parse import urlparse, urljoin
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -263,15 +263,20 @@ def submit_vote():
             result["message"] = "Vote submitted"
             result["vote"] = str(nom.id)
 
-        db.session.flush()
-        db.session.refresh(current_user)
+        passed = False
+        try:
+            db.session.flush()
+            db.session.refresh(current_user)
+            passed = True
+        except IntegrityError:
+            pass
 
-        if validate_votes(nom, current_user):
+        if passed and validate_votes(nom, current_user):
             db.session.commit()
         else:
             db.session.rollback()
             result["success"] = 0
-            result["message"] = "Stop trying to exploit my app!"
+            result["message"] = "Stop trying to exploit the app!"
 
     return json.dumps(result), 200
 
