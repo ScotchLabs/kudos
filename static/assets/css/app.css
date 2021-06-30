@@ -57,3 +57,70 @@ ul.actions.fit.small {
 ul.actions.fit.small li {
     padding: 0 0 0 0.5em;
 }
+
+/* Floating labels */
+
+.floating-input {
+    color: black !important;
+}
+
+.floating-input::-moz-placeholder {
+    color: rgba(0, 0, 0, 0) !important;
+}
+
+.floating-input:-ms-input-placeholder {
+    color: rgba(0, 0, 0, 0) !important;
+}
+
+.floating-input::placeholder {
+    color: rgba(0, 0, 0, 0) !important;
+}
+
+.floating-label {
+    display: block;
+    position: relative;
+    max-height: 0;
+    pointer-events: none;
+    margin: 0;
+}
+
+.floating-label::before {
+    content: attr(data-content);
+    display: inline-block;
+    filter: blur(0);
+    -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+    transform-origin: left top;
+    transition: transform 0.2s ease;
+    left: 1em;
+    position: relative;
+}
+
+.floating-input:-moz-placeholder-shown + .floating-label::before {
+    transform: translate3d(0, -2.5em, 0) scale3d(1, 1, 1);
+}
+
+.floating-input:-ms-input-placeholder + .floating-label::before {
+    transform: translate3d(0, -2.5em, 0) scale3d(1, 1, 1);
+}
+
+.floating-input:placeholder-shown + .floating-label::before {
+    transform: translate3d(0, -2.5em, 0) scale3d(1, 1, 1);
+}
+
+.floating-label::before,
+.floating-input:focus + .floating-label::before {
+    transform: translate3d(-0.5em, -4.72em, 0) scale3d(0.9, 0.9, 1);
+}
+
+.floating-label span {
+    border: 0;
+    clip: rect(1px 1px 1px 1px);
+    clip: rect(1px, 1px, 1px, 1px);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}

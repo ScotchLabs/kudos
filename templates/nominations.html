@@ -32,10 +32,12 @@
                         <div class="row gtr-50 gtr-uniform">
                             <div class="col-9 col-12-mobilep">
                                 {% if form.award_id.data == award.id|string %}
-                                    <input placeholder="{{ form.entry.label.text }}" type="text" required="" value="{{ form.entry.data }}">
+                                    <input class="floating-input" id="entry-{{ award.id }}" placeholder="{{ form.entry.label.text }}" type="text" required="" value="{{ form.entry.data }}">
+                                    <label for="entry-{{ award.id }}" class="floating-label" data-content="{{ form.entry.label.text }}"><span>{{ form.entry.label.text }}</span></label>
                                     {{ render_errors(form.entry) }}
                                 {% else %}
-                                    <input placeholder="{{ form.entry.label.text }}" type="text" required="">
+                                    <input class="floating-input" id="entry-{{ award.id }}" placeholder="{{ form.entry.label.text }}" type="text" required="">
+                                    <label for="entry-{{ award.id }}" class="floating-label" data-content="{{ form.entry.label.text }}"><span>{{ form.entry.label.text }}</span></label>
                                 {% endif %}
                             </div>
                             <div class="col-3 col-12-mobilep">

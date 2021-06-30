@@ -15,11 +15,13 @@
                 {{ form.csrf_token }}
                 <div class="row gtr-50 gtr-uniform">
                     <div class="col-12">
-                        {{ form.username(placeholder=form.username.label.text) }}
+                        {{ form.username(placeholder=form.username.label.text, class="floating-input") }}
+                        <label for="username" class="floating-label" data-content="{{ form.username.label.text }}"><span>{{ form.username.label.text }}</span></label>
                         {{ render_errors(form.username) }}
                     </div>
                     <div class="col-12">
-                        {{ form.password(placeholder=form.password.label.text) }}
+                        {{ form.password(placeholder=form.password.label.text, class="floating-input") }}
+                        <label for="password" class="floating-label" data-content="{{ form.password.label.text }}"><span>{{ form.password.label.text }}</span></label>
                         {{ render_errors(form.password) }}
                         <p>
                             <a href="{{ url_for('reset') }}">Forgot Password</a><br>
