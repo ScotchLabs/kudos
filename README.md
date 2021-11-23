@@ -26,7 +26,7 @@ Additionally, you may also use whatever G Suite domain you have for Google Mail.
 
 # Local Testing
 
-Before deploying the application, you should test it locally to make sure everything works. First, clone this git repository to somewhere on your machine, install the requirements, create and fill `config_secrets.py`, run the `init_db` function from `dbutils.py`, and then run `application.py`. Then open the url given in the console and try to create an account and submit some nominations. You can return to `dbutils.py` and run the `give_admin` function on your username to make yourself an admin, and then explore the admin page which should now appear in the dropdown menu under your username on the site.
+Before deploying the application, you should test it locally to make sure everything works. First, clone this git repository to somewhere on your machine, install the requirements, create and fill `config_secrets.py`, run the `init_db` function from `dbutils.py`, and then run `app.py`. Then open the url given in the console and try to create an account and submit some nominations. You can return to `dbutils.py` and run the `give_admin` function on your username to make yourself an admin, and then explore the admin page which should now appear in the dropdown menu under your username on the site.
 
 Note that you can run any of the functions in `dbutils.py` via the command line as illustrated below:
 

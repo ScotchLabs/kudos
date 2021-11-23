@@ -1,8 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, HiddenField, SubmitField, \
-    DateTimeField, BooleanField
+    DateTimeField, BooleanField, DateTimeLocalField
 from wtforms.widgets import HiddenInput
-from wtforms.fields.html5 import DateTimeLocalField
 from wtforms.validators import DataRequired, Length, ValidationError
 from app_manager import db
 from models import User, Nomination

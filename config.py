@@ -7,7 +7,10 @@ except ImportError:
 
 DEBUG = False
 SQLALCHEMY_TRACK_MODIFICATIONS = False
-SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "sqlite:///data.db")
+uri = os.getenv("DATABASE_URL", "sqlite:///data.db")
+if uri.startswith("postgres://"):
+    uri = uri.replace("postgres://", "postgresql://", 1)
+SQLALCHEMY_DATABASE_URI = uri
 SECRET_KEY = os.getenv("SECRET_KEY", key)
 BCRYPT_LOG_ROUNDS = 12
 MAIL_SERVER = "smtp.gmail.com"
