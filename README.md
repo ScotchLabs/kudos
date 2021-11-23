@@ -60,7 +60,7 @@ python config_heroku.py
 This sets the environment variables from your `config_secrets.py` file on the heroku server. Then, run
 
 ```
-git push heroku master
+git push heroku
 ```
 
 This will deploy the application. Once that completes, you need to initialize the database on the heroku server. To do that, run
