@@ -31,6 +31,6 @@ six==1.16.0
 SQLAlchemy==1.4.27
 tzdata==2021.5
 tzlocal==4.1
-Werkzeug==2.0.2
+Werkzeug==2.2.3
 WTForms==3.0.0
 zipp==3.6.0
